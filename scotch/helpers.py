@@ -48,7 +48,7 @@ def parse(S, states_map=[], params=[]) :
             
             # If it's a parameter, wrap it in ()
 			if buff in params :
-				out.append("(%s)" % params[buff])
+				out.append("(%s)" % parse(params[buff]))
                 
             # Else, if it's a state variable, replace it with vector notation
 			elif buff in states_map :

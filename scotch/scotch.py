@@ -206,12 +206,12 @@ class model(object) :
 		self.initconds = { s : int(raw_input("%s : " % s)) for s in self.states }
 		
 		# Parameters
-		print "\nComplete list of parameters :"
+		print "\nComplete list of parameters, separated by commas :"
 		params = raw_input().replace(" ", "").split(",")
 
 		# Value of each parameter
-		print "\nValues of parameters, separated by commas :"
-		self.parameters = { p : helpers.parse(raw_input("%s : " % p)) for p in params }
+		print "\nValues of parameters :"
+		self.parameters = { p : raw_input("%s : " % p) for p in params }
 
 		# State transitions
 		reaction = []
@@ -234,7 +234,7 @@ class model(object) :
 
 
 
-	def plot(self, t, algorithm=None) :
+	def plot(self, T, algorithm=None) :
 
 		import matplotlib.pyplot as plt
 		try :
@@ -243,16 +243,19 @@ class model(object) :
 			pass
 
 		if algorithm == None :
-			t, trace = simulate.gillespie(self, t)
+			t, trace = simulate.gillespie(self, T)
 			plt.plot(t, trace)
 			plt.legend(self.states)
 
 
 
+# CURRENTLY : -----------------------
+# line 20 simulate.py
+# TypeError: float() argument must be a string or a number
+# Check parsing of parameters
 
 
 
 
 
-	
 

@@ -21,3 +21,16 @@ import scotch
 
 model = scotch.model()
 ```
+
+
+
+TO DO 
+-----
+
+- Runtime warnings ( in tau-leaping, when we draw more transitions than are possible, for 
+example )
+- Sampling ( generate N realisations, compute summary statistics )
+- Inference ( MLE methods for parameters )
+- Simulation ( implicit tau-leaping ? Adaptive timestepping )
+- Forecasting ( filtering methods ? )
+- Parallelisation ( primarily, shared-memory )

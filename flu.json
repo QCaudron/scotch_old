@@ -1,0 +1,66 @@
+{
+    "Filename" : "/Users/qcaudron/repositories/scotch/flu.json",
+    "InitialConditions" : {
+        "I" : 3,
+        "R" : 0,
+        "S" : 10000
+    },
+    "Parameters" : {
+        "d" : "0.5",
+        "g" : "365/14",
+        "m" : "1/60./365",
+        "r0" : "1.5"
+    },
+    "Reactions" : [
+        [
+            "U",
+            "S",
+            "m * (S+I+R)"
+        ],
+        [
+            "S",
+            "U",
+            "m * S"
+        ],
+        [
+            "I",
+            "U",
+            "m * I"
+        ],
+        [
+            "R",
+            "U",
+            "m * R"
+        ],
+        [
+            "S",
+            "I",
+            "r0 * g * S * I / (S+I+R)"
+        ],
+        [
+            "I",
+            "R",
+            "g * I"
+        ],
+        [
+            "R",
+            "S",
+            "R * d"
+        ],
+        [
+            "U",
+            "I",
+            "0.01"
+        ],
+        [
+            "U",
+            "I",
+            "3"
+        ]
+    ],
+    "States" : [
+        "S",
+        "I",
+        "R"
+    ]
+}

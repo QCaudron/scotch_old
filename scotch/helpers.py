@@ -1,3 +1,9 @@
+import sys
+import numpy as np
+
+
+
+
 # Required model fields
 required = ["States", 
 			"Parameters",
@@ -52,7 +58,7 @@ def parse(S, states_map=[], params=[]) :
                 
             # Else, if it's a state variable, replace it with vector notation
 			elif buff in states_map :
-				out.append("X[%d]" % states_map[buff])
+				out.append("int(X[%d])" % states_map[buff])
                 
             # Else, it's a constant, cast as a float
 			elif buff :
@@ -80,6 +86,23 @@ def parse(S, states_map=[], params=[]) :
 
 
 
+
+
+
+def progBarStart(width=25) :
+
+	sys.stdout.write("[%s]" % (" " * width))
+	sys.stdout.flush()
+	sys.stdout.write("\b" * (width+1))
+
+
+
+
+def progBarUpdate(t, tmax, width=25) :
+	
+	if np.fmod(t[0] / float(tmax), 1./width) > np.fmod(t[-1] / float(tmax), 1./width) :
+		sys.stdout.write("-")
+		sys.stdout.flush()
 
 
 

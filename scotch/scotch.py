@@ -164,7 +164,7 @@ class model(object) :
 		self.states_map = { i : idx for i, idx in zip(self.states, range(self.N_states)) }
 
 		# Transition matrix
-		self.transition = np.zeros((self.N_states, self.N_reactions))
+		self.transition = np.zeros((self.N_states, self.N_reactions), dtype=int)
 		for i, val in enumerate(self.reactions) :
 			if val[0] in self.states :
 				self.transition[self.states_map[val[0]], i] = -1
@@ -234,7 +234,7 @@ class model(object) :
 
 
 
-	def plot(self, T, algorithm=None) :
+	def plot(self, T, algorithm=simulate.gillespie) :
 
 		import matplotlib.pyplot as plt
 		try :
@@ -242,10 +242,10 @@ class model(object) :
 		except :
 			pass
 
-		if algorithm == None :
-			t, trace = simulate.gillespie(self, T)
-			plt.plot(t, trace)
-			plt.legend(self.states)
+		t, trace = simulate.gillespie(self, T)
+		plt.plot(t, trace)
+		plt.legend(self.states)
+		plt.show()
 
 
 

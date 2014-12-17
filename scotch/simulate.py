@@ -31,7 +31,7 @@ def gillespie(model, tmax) :
 
 		# Determine which event occurred after ensuring that there's 
 		# a valid transition, and update the state space
-		if np.sum(rates) == 0 :
+		if np.sum(rates) <= 0 :
 			print "Stopping early - no valid transitions !"
 			break
 
@@ -94,7 +94,7 @@ def tauLeap(model, tmax, tau=1) :
 
 		# Determine which events occurred after ensuring that there's 
 		# a valid transition, and update the state space
-		if np.sum(rates) == 0 :
+		if np.sum(rates) <= 0 :
 			print "Stopping early - no valid transitions !"
 			break
 
@@ -103,13 +103,16 @@ def tauLeap(model, tmax, tau=1) :
 		estReactions = [np.random.poisson(rate * tau) for rate in rates]
 
 		# Correct so things don't go negative
-		cappedReactions = [np.where(model.transition[:, i] == -1) for i in range(model.N_reactions)]
-		maxReactions = [model.X[i] if len(i[0]) == 1 else np.inf for i in cappedReactions]
+		cappedReactions = [np.where(model.transition[:, i] == -1)[0] for i in range(model.N_reactions)] # reaction takes one away from here
+		maxReactions = [model.X[i] if len(i) == 1 else np.inf for i in cappedReactions]
 		doneReactions = np.min((maxReactions, estReactions), axis=0).astype(int)
 
+		if (doneReactions != estReactions).all() :
+			print "Some reactions could not take place due to small state variable."
+			print "Perhaps tau is too large."
 
 		# Increase time
-		t.append(t[-1] + tau)
+		t.append(t[-1] + tau * float(np.sum(doneReactions)) / np.sum(estReactions))
 
 
 		# Update the state space

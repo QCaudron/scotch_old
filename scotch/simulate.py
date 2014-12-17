@@ -8,6 +8,7 @@ def gillespie(model, tmax) :
 
 	# Initialise
 	t = [0]
+	model.build(silent=True) # initialise model
 	trace = model.X[:]
 	rates = np.zeros(model.N_reactions)
 
@@ -112,7 +113,11 @@ def tauLeap(model, tmax, tau=1) :
 			print "Perhaps tau is too large."
 
 		# Increase time
-		t.append(t[-1] + tau * float(np.sum(doneReactions)) / np.sum(estReactions))
+		# if there's at least one reaction but we can't do them all
+		if (doneReactions != estReactions).all() and np.sum(estReactions) > 0 :
+			t.append(t[-1] + tau * float(np.sum(doneReactions)) / np.sum(estReactions))
+		else :
+			t.append(t[-1] + tau)
 
 
 		# Update the state space

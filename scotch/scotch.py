@@ -155,7 +155,7 @@ class model(object) :
 
 
 	# If data is entered manually, then fill in the blanks
-	def build(self) :
+	def build(self, silent=False) :
 		"""Build the model if it is entered manually."""
 
 		# Model variables
@@ -181,7 +181,8 @@ class model(object) :
 		for i, val in enumerate(self.reactions) :
 			self.rates.append(eval("lambda X : %s" % helpers.parse(val[2], self.states_map, self.parameters)))
 
-		print self
+		if not silent :
+			print self
 
 
 

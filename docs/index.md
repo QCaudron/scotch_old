@@ -1,4 +1,7 @@
-# Welcome to MkDocs
+# scotch
+
+_scotch_ is awesome.
+
 
 For full documentation visit [mkdocs.org](http://mkdocs.org).
 

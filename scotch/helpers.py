@@ -106,3 +106,14 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 
+
+
+
+
+
+def trackIndividuals(model, individuals, transition, t, incremental=False) :
+
+	pass
+
+
+

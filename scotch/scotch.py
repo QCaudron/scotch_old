@@ -33,9 +33,10 @@ class model(object) :
 			self.initconds = {} # Initial conditions
 			self.parameters = {} # Parameters
 			self.reactions = [] # Reactions
-			self.optional = {} # Optional fields, like dataset, save name, ...
+			self.optional = { "default_algorithm" : "simulate.gillespie" } # Optional fields, like dataset, save name, ...
 			self.states_map = {} # Map between state symbols and vector notation
 			self.transition = None # Transition matrix
+
 
 
 
@@ -250,10 +251,40 @@ class model(object) :
 
 
 
-# CURRENTLY : -----------------------
-# line 20 simulate.py
-# TypeError: float() argument must be a string or a number
-# Check parsing of parameters
+
+
+
+
+	def simulate(self, T, **kwargs) :
+
+		# Additional arguments for different algorithms
+		algoparams = {
+			simulate.tauLeap : ["tau"]
+		}
+
+
+		# Determine algorithm
+		algorithm = kwargs.get("algorithm", eval("simulate." + self.optional["default_algorithm"]))
+
+		
+		# If not Gillespie, check that required parameters are present
+		for algo, params in algoparams.items() :
+			if algorithm == algo :
+				for p in params :
+					assert p in kwargs, "The parameter %s is required for the %s algorithm." % (p, algo)
+
+
+		# Are we tracking individuals ?
+		tracking = kwargs.get("track", False)
+		if tracking :
+			incremental = kwargs.get("incremental", False)
+
+
+
+
+
+
+
 
 
 

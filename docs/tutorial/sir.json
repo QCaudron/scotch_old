@@ -1,29 +1,31 @@
 {
-    "Filename" : "scotch_model.json",
+    "States" : [
+        "S",
+        "I",
+        "R"
+    ],
+
     "InitialConditions" : {
         "I" : 1,
         "R" : 0,
         "S" : 99
     },
+
     "Parameters" : {
-        "g" : "1/14",
-        "r0" : "17"
+        "gamma" : "1/14",
+        "r0" : "18"
     },
+
     "Reactions" : [
         [
             "S",
             "I",
-            "r0 * g * S * I / (S+I+R)"
+            "r0 * gamma * S * I / (S+I+R)"
         ],
         [
             "I",
             "R",
-            "I * g"
+            "gamma * I"
         ]
-    ],
-    "States" : [
-        "S",
-        "I",
-        "R"
     ]
 }

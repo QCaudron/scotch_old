@@ -1,15 +1,15 @@
 <img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/images/logo.jpg" style="width: 200px;" />
 
 _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch**ains, or 
-Markov processes. We are currently in alpha release; contributions are welcome ! For pull 
-requests or bug reports, find us on [Github](http://qcaudron.github.io/scotch). 
+Markov processes. We are currently in alpha release; contributions are very welcome. For pull requests or bug reports, find us on [Github](http://qcaudron.github.io/scotch). 
 
-Stochastic systems are described by their state space and the transitions between them. _scotch_ 
-can simulate random walks, systems can be described by differential equations, 
+Stochastic systems are described by their state space and the transitions between them. _scotch_ can simulate stochastic systems with discrete state space
+
+
+random walks, systems can be described by differential equations, 
 and finite state machines, or any ( we think ) stochastic systems with finite state spaces.
 
-We're in the process of rewriting some of the model definition language to generalise to a 
-larger range of models. Both the package and documentation are in semi-active development - watch this space.
+We're in the process of rewriting some of the model definition language to generalise to a larger range of models. Both the package and documentation are in semi-active development - watch this space.
 
 
 
@@ -17,11 +17,10 @@ larger range of models. Both the package and documentation are in semi-active de
 
 This will get removed, just a note for me :
 
-- Markov Processes : just a few pages about CTMC, what they can do, what models can be described 
-as Markov chains. Also simulation algorithms, steady-state results, ...
 - Scotch docs : documentation on the package; model definition, using the package
+- Markov Processes : just a few pages about CTMC, what they can do, what models can be described as Markov chains. Also simulation algorithms, steady-state results, ...
 - Examples : a few example scotch models to be used as a tutorial
-
+- Model repository : maybe a few finished model JSON files to download ?
 
 
 ## Roadmap
@@ -39,59 +38,4 @@ as Markov chains. Also simulation algorithms, steady-state results, ...
 - adaptive timestepping in tau-leaping
 - generating trace distributions with credible intervals
 - parameter inference
-
-
-
-
-
-## Quickstart
-
-Note - all of this Quickstart will be moved to a Tutorial section, so that Quickstart can be 
-only a few lines, really a quickstart.
-
-
-
-### Using the Wizard
-
-Start by creating a model with the help of the wizard.
-
-```
-import scotch
-
-model = scotch.model()
-model.wizard()
-```
-
-We've created an SIR epidemiological with three state variables : `S`, `I`, and `R`. Individuals 
-move from the susceptible state `S` to the infected class `I` at a rate proportional to `S` and 
-`I` as the infection propagates, and then infected individuals move into the Recovered state `R` 
-at a rate proportional to the number of individuals in `I`. 
-
-We can then immediately simulate this system using the Gillespie algorithm and plot the results, 
-up to some final time.
-
-```
-model.plot(30)
-```
-
-![SIR model simulated using Gillespie algorithm](images/sir.png)
-
-
-
-### Creating a _scotch_ model file
-
-_scotch_ models are defined in JSON format. A complete _scotch_ model file can look like this :
-```
-File goes here - currently redefining scotch's model definition.
-```
-
-
-
-
-### Simulating the model
-
-
-### Sampling trace expectations and credible intervals
-
-
 

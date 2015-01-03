@@ -1,4 +1,4 @@
-![scotch](http://qcaudron.github.com/scotch/docs/logo.jpg)
+<img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/logo.jpg" height=200px" />
 
 _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch**ains, or 
 Markov processes. We are currently in alpha release; contributions are welcome ! For pull 

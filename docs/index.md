@@ -1,14 +1,15 @@
-<img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/logo.jpg" height=200px" />
+<img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/logo.jpg" style="width: 200px;" />
 
 _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch**ains, or 
 Markov processes. We are currently in alpha release; contributions are welcome ! For pull 
 requests or bug reports, find us on [Github](http://qcaudron.github.io/scotch). 
 
 Stochastic systems are described by their state space and the transitions between them. _scotch_ 
-can simulate ( we think... ) random walks, systems can be described by differential equations, 
-and finite state machines, amongst other mathematical systems.
+can simulate random walks, systems can be described by differential equations, 
+and finite state machines, or any ( we think ) stochastic systems with finite state spaces.
 
-Both the package and documentation are in semi-active development - watch this space.
+We're in the process of rewriting some of the model definition language to generalise to a 
+larger range of models. Both the package and documentation are in semi-active development - watch this space.
 
 
 
@@ -36,6 +37,10 @@ Both the package and documentation are in semi-active development - watch this s
 
 
 ## Quickstart
+
+Note - all of this Quickstart will be moved to a Tutorial section, so that Quickstart can be 
+only a few lines, really a quickstart.
+
 
 
 ### Using the Wizard
@@ -69,5 +74,16 @@ model.plot(30)
 
 _scotch_ models are defined in JSON format. A complete _scotch_ model file can look like this :
 ```
-File goes here
+File goes here - currently redefining scotch's model definition.
 ```
+
+
+
+
+### Simulating the model
+
+
+### Sampling trace expectations and credible intervals
+
+
+

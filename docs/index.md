@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/logo.jpg" style="width: 200px;" />
+<img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/images/logo.jpg" style="width: 200px;" />
 
 _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch**ains, or 
 Markov processes. We are currently in alpha release; contributions are welcome ! For pull 
@@ -13,6 +13,14 @@ larger range of models. Both the package and documentation are in semi-active de
 
 
 
+## Structure of these docs 
+
+This will get removed, just a note for me :
+
+- Markov Processes : just a few pages about CTMC, what they can do, what models can be described 
+as Markov chains. Also simulation algorithms, steady-state results, ...
+- Scotch docs : documentation on the package; model definition, using the package
+- Examples : a few example scotch models to be used as a tutorial
 
 
 
@@ -66,7 +74,7 @@ up to some final time.
 model.plot(30)
 ```
 
-![SIR model simulated using Gillespie algorithm](tutorial/sir.png)
+![SIR model simulated using Gillespie algorithm](images/sir.png)
 
 
 

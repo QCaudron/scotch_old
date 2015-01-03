@@ -1,8 +1,8 @@
 site_name: scotch
 theme: cosmo
-<!-- repo_url: https://github.com/qcaudron/scotch/
+repo_url: https://github.com/qcaudron/scotch/
 site_description: Markov Chains in Python
-use_directory_urls=true -->
+use_directory_urls: true
 
 pages:
 - ["index.md", "scotch"]

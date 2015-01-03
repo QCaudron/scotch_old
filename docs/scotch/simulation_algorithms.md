@@ -1,6 +1,6 @@
 Title: Simulation Algorithms
 
-# Simulation algorithms API
+## Simulation algorithms API
 
 ### The Gillespie algorithm
 

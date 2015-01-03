@@ -1,6 +1,6 @@
 Title: Random Walk
 
-# The Whisky-Fuelled Random Walk
+## The Whisky-Fuelled Random Walk
 
 After a night of enjoying substantial amounts of single malt scotch, a Python programmer must stumble home from the bar. With impaired motor skills, she staggers home, with each step either :
  

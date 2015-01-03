@@ -1,4 +1,4 @@
-# Quick Start
+## Quick Start
 
 In this quick-start, we'll implement the [Susceptible-Infected-Recovered](http://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology) epidemiological model. This compartmental model is typically described by a system of deterministic, ordinary differential equations :
 

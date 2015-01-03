@@ -1,4 +1,4 @@
-# Algorithms for Simulating Markov Chains
+## Algorithms for Simulating Markov Chains
 
 ### The Gillespie Algorithm
 

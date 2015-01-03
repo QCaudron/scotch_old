@@ -1,3 +1,7 @@
+Title: scotch Model Definitions
+
+
+
 # scotch models
 
 _scotch_ models are JSON files that describe stochastic systems by their state space, their 

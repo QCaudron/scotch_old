@@ -1,2 +1,11 @@
 site_name: scotch
 theme: cosmo
+
+pages:
+- ["index.md", "scotch"]
+- ["ctmc.md", "Continuous-time Markov Chains"]
+- ["scotch_models.md", "scotch Model Description"]
+- ["simulation_algorithms.md", "Simulation Algorithms"]
+- ["examples/random_walk.md", "Examples", "Whisky-Fuelled Random Walk"]
+- ["examples/lotka_volterra.md", "Examples", "Lotka-Volterra Equations"]
+- ["examples/seir.md", "Examples", "SEIR Epidemic Model"]

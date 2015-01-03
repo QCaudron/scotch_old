@@ -1,13 +1,10 @@
 Title: scotch Model Definitions
 
-
-
 # scotch models
 
-_scotch_ models are JSON files that describe stochastic systems by their state space, their 
-parameters, and a list of *reactions* between states. As with all [continuous-time Markov 
-processes](http://en.wikipedia.org/wiki/Continuous-time_Markov_chain), state spaces must be 
-finite or countable
+_scotch_ models are JSON files that describe stochastic systems by their state space, their parameters, and a list of *reactions* between states. As with all [continuous-time Markov processes](http://en.wikipedia.org/wiki/Continuous-time_Markov_chain), state spaces must be finite or countable.
+
+**More info here.**
 
 ```
 {
@@ -18,27 +15,29 @@ finite or countable
     ],
 
     "InitialConditions" : {
+        "S" : 99,
         "I" : 1,
-        "R" : 0,
-        "S" : 99
+        "R" : 0
     },
 
     "Parameters" : {
-        "gamma" : "1/14",
-        "r0" : "18"
+        "r0" : "18",
+        "gamma" : "1/14"
     },
 
     "Reactions" : [
-        [
-            "S",
-            "I",
-            "r0 * gamma * S * I / (S+I+R)"
-        ],
-        [
-            "I",
-            "R",
-            "gamma * I"
-        ]
+        {
+            "r0 * gamma * S * I / (S+I+R)" : {
+                "S" : -1,
+                "I" : 1
+            }
+        },
+        {
+            "gamma * I" : {
+                "I" : -1,
+                "R" : 1
+            }
+        }
     ]
 }
 ```

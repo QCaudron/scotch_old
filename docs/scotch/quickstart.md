@@ -2,7 +2,7 @@
 
 In this quick-start, we'll implement the [Susceptible-Infected-Recovered](http://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology) epidemiological model. This compartmental model is typically described by a system of deterministic, ordinary differential equations :
 
-![SIR](images/sir_equations.png)
+<img src="images/sir_equations.png" style="width: 200px" />
 
 In the case of small populations, the continuous property of the state space can be a poor assumption, and we may prefer to simulate each individual in the population as whole entities. We'll phrase this model in the language of discrete-state stochastic processes, particularly that of continuous-time Markov chains. 
 

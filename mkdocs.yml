@@ -1,5 +1,5 @@
 site_name: scotch
-theme: cosmo
+theme: readthedocs
 repo_url: https://github.com/qcaudron/scotch/
 site_description: Markov Chains in Python
 use_directory_urls: true

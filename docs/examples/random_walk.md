@@ -1,6 +1,10 @@
 Title: Random Walk
 
-## The Whisky-Fuelled Random Walk
+# The Whisky-Fuelled Random Walk
+
+
+
+### Scenario
 
 After a night of enjoying substantial amounts of single malt scotch, a Python programmer must stumble home from the bar. With impaired motor skills, she staggers home, with each step either :
  
@@ -10,6 +14,10 @@ After a night of enjoying substantial amounts of single malt scotch, a Python pr
 
 
 We only wish to measure her distance from home, and thus define the state space as the one-dimensional variable `D`. We start `D` with an initial condition of one hundred steps. With probability `p`, `D` decreases by one; with probability `q`, `D` increases by one; and with probability `r`, `D` remains unchanged.
+
+
+
+### _scotch_ model specification
 
 We can express this system as a _scotch_ model as follows :
 
@@ -65,3 +73,10 @@ The `Parameters` entry combines this style : each entry is a key-value pair mapp
 That is, with probability `s`, we take a step that increases the X and Y coordinates by one each. This reaction is written as a dictionary, with an expression for the rate of the reaction as the key, and the value being a dictionary, with keys representing state variables and values representing the change in that state when the reaction occurs.
 
 Finally, note that, in the language of random walks, we've described our parameters `p, q, r` as probabilities here. However, _scotch_ expects rates, and thus, the parameters need not sum to one.
+
+
+
+
+### Simulation
+
+Stuff here.

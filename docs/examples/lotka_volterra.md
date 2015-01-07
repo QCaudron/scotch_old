@@ -4,3 +4,5 @@ Title: Lotka-Volterra Equations
 
 
 ### Alpha bunnies go here
+
+<img src="images/alphabunnies.jpg" />

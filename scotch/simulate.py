@@ -73,15 +73,13 @@ def gillespie(model, tmax) :
 
 
 
-
-
-
 def tauLeap(model, tmax, tau=1) :
 
 	# Initialise
 	t = [0]
 	trace = model.X[:]
 	rates = np.zeros(model.N_reactions)
+	tracking_idx = -1;
 
 	# Start the progress bar
 	helpers.progBarStart()
@@ -119,6 +117,35 @@ def tauLeap(model, tmax, tau=1) :
 		else :
 			t.append(t[-1] + tau)
 
+		#print model.reactions
+		#print doneReactions*model.transition
+		print np.sum(model.transition * doneReactions, axis=1)
+
+
+		# # Check if model is tracking states
+		# if model.tracked_states != None :
+		# 	if int(t[-1]) > tracking_idx:
+		# 		tracking_idx+=1
+		# 		tracked_IDs = {}
+		# 	# set up vectors for states if t =0
+		# 		for s in model.tracked_states :
+		# 			tracked_IDs[s] = []
+		# 	# set up temporary dictionary to count reactions for each state
+		# 	temp_count_dict = {}
+		# 	for s in model.tracked_states :
+
+		# 		temp_count_dict[s].append
+
+		# Check if model is tracking reactions
+		
+
+			
+
+
+
+
+
+
 
 		# Update the state space
 		model.X += np.sum(model.transition * doneReactions, axis=1)
@@ -140,9 +167,67 @@ def tauLeap(model, tmax, tau=1) :
 
 
 
+def count_tracked(tracked_state,  model, doneReactions) :
+	for idx, r in enumerate(model.reactions):
+		if r[1] == tracked_state :
+			count = doneReactions[idx]
+	return count
 
 
 
+def track_reactions(model, trackAll = True):
+	if trackAll == False:
+		print "Would you like to track any reactions? (y/n)"
+		reaction_tracker_ind = raw_input()
+		if reaction_tracker_ind == "y" :
+			print model
+			print "Which reactions would you like to track? (enter Reaction Numbers separated by commas)"				
+			incorrectReactions = True
+			while incorrectReactions == True:
+				num_tracked_trans = raw_input().split(",")					
+				int_tracked_trans = [int(x) for x in num_tracked_trans]
+				#print range(len(model.reactions))
+				checkset = [x for x in int_tracked_trans if x not in range(len(model.reactions))]
+				if checkset == []:
+						incorrectReactions = False
+				else:
+					print ("Error: %s  not valid reaction number(s)" % checkset)
+					print ("Please re-enter reaction numbers") 
+
+
+
+			#print incorrectReactions
+			model.tracked_trans = [model.reactions[x] for x in int_tracked_trans] 
+			#print model.tracked_trans
+			#generate tracked states from transitions					
+			model.tracked_states = []
+			for t in model.tracked_trans :
+				for t2 in t :
+					if (t2 in model.states and t2 not in model.tracked_states):
+						model.tracked_states.append(t2)
+		else :
+			print "Would you like to track any states? (y/n)"
+			state_tracker_ind = raw_input()
+
+			if state_tracker_ind == "y":
+				print "Which states would you like to track? (Enter state numbers separated by commas)"
+				for idx,state in enumerate(model.states):
+					print ("Number %s: %s" %(idx, state))
+				incorrectStates = True
+				while  incorrectStates == True:
+					num_tracked_states = raw_input().split(",")
+					int_tracked_states = [int(x) for x in num_tracked_states]
+					checkset = [x for x in int_tracked_states if x not in range(len(model.states))]
+					if checkset == []:
+						incorrectStates = False
+					else:
+						print ("Error: %s  not valid state number(s)" % checkset)
+						print ("Please re-enter state numbers")
+
+				model.tracked_states = [model.states[x] for x in int_tracked_states] 
+	else:
+		model.tracked_trans = model.reactions
+		model.tracked_states = model.states
 
 
 

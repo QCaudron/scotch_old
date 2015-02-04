@@ -3,14 +3,36 @@ import numpy as np
 import helpers
 
 
+
+
+
+
+
+
 # Gillespie algorithm
-def gillespie(model, tmax) :
+def gillespie(model, tmax, track=False, incremental=False) :
 
 	# Initialise
 	t = [0]
 	model.build(silent=True) # initialise model
 	trace = model.X[:]
 	rates = np.zeros(model.N_reactions)
+
+	"""
+	# If we're tracking individuals, generate IDs for everyone
+	if track :
+		if incremental : 
+			events = {}
+		else :
+
+		maxID = 0
+		individuals = {}
+		statespace = {}
+		for i, state in enumerate(model.states) :
+			statespace[state] = range(maxID, maxID + model.X[i])
+			maxID += model.X[i]
+		individuals[0] = statespace # add initial IDs to individuals for t=0
+	"""
 
 	# Generate this many random uniforms at once, for speed
 	randsize = 1000
@@ -22,6 +44,8 @@ def gillespie(model, tmax) :
 
 	# Start the progress bar
 	helpers.progBarStart()
+
+
 
 	# Continue until we hit tmax
 	while t[-1] < tmax :
@@ -42,7 +66,13 @@ def gillespie(model, tmax) :
 
 
 		# Update the state space
-		model.X += model.transition[:, np.where(np.random.uniform() < np.cumsum(rates / np.sum(rates)))[0][0]]
+		trans = np.where(np.random.uniform() < np.cumsum(rates / np.sum(rates)))[0][0]
+		model.X += model.transition[:, trans]
+
+
+		# If we're tracking, keep track of the transition
+		#if track :
+		#	if incremental :
 
 		
 		# At the end of randsize iterations, update randsize "adaptively"
@@ -73,7 +103,14 @@ def gillespie(model, tmax) :
 
 
 
+<<<<<<< HEAD
 def tauLeap(model, tmax, tau=1) :
+=======
+
+
+
+def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
+>>>>>>> FETCH_HEAD
 
 	# Initialise
 	t = [0]
@@ -85,11 +122,26 @@ def tauLeap(model, tmax, tau=1) :
 	helpers.progBarStart()
 
 
+	"""
+	# If we're tracking individuals, generate IDs for everyone
+	if track :
+		maxID = 0
+		individuals = {}
+		for i, state in enumerate(model.states) :
+			individuals[state] = range(maxID, maxID + model.X[i])
+			maxID += model.X[i]
+	"""
+
+	cappedReactions = [np.where(model.transition[:, i] == -1)[0] for i in range(model.N_reactions)] # reaction takes one away from here
+
+
 	# Continue until we hit tmax
 	while t[-1] < tmax :
 
 		# Compute a rates vector 
 		rates = [rate(model.X) for rate in model.rates]
+
+		assert (np.array(rates) < 0).sum() == 0, "Negative rates, you die now. % s" % rates
 
 		# Determine which events occurred after ensuring that there's 
 		# a valid transition, and update the state space
@@ -97,16 +149,14 @@ def tauLeap(model, tmax, tau=1) :
 			print "Stopping early - no valid transitions !"
 			break
 
+		# Correct so things don't go negative :		
+		maxReactions = np.array([model.X[i] if len(i) == 1 else np.inf for i in cappedReactions], dtype=int)[:, 0]
 
 		# Determine the number of times each transition happens in tau time
-		estReactions = [np.random.poisson(rate * tau) for rate in rates]
-
-		# Correct so things don't go negative
-		cappedReactions = [np.where(model.transition[:, i] == -1)[0] for i in range(model.N_reactions)] # reaction takes one away from here
-		maxReactions = [model.X[i] if len(i) == 1 else np.inf for i in cappedReactions]
+		estReactions = np.array([np.random.poisson(rate * tau) for rate in rates], dtype=int)
 		doneReactions = np.min((maxReactions, estReactions), axis=0).astype(int)
 
-		if (doneReactions != estReactions).all() :
+		if not (doneReactions != estReactions).all() :
 			print "Some reactions could not take place due to small state variable."
 			print "Perhaps tau is too large."
 
@@ -147,8 +197,18 @@ def tauLeap(model, tmax, tau=1) :
 
 
 
+
+		print "State space", model.X
+		print "Done reactions", doneReactions
+		print "State Space Change", np.sum(model.transition * doneReactions, axis=1)
+		print "Est", estReactions
+		print "Max reactions", maxReactions
 		# Update the state space
-		model.X += np.sum(model.transition * doneReactions, axis=1)
+		model.X += np.sum(model.transition * doneReactions, axis=1).astype(int)
+
+
+
+		assert (model.X < 0).sum() == 0, "Negative state space, you DIE NAO"
 
 
 		# Append new state space to trace
@@ -172,6 +232,10 @@ def count_tracked(tracked_state,  model, doneReactions) :
 		if r[1] == tracked_state :
 			count = doneReactions[idx]
 	return count
+
+	# PROBLEM :
+	# Max reactions should take into account total outwards stream, not just per reaction
+
 
 
 

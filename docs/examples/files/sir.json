@@ -1,0 +1,33 @@
+{
+    "States" : [
+        "S",
+        "I",
+        "R"
+    ],
+
+    "InitialConditions" : {
+        "I" : 1,
+        "R" : 0,
+        "S" : 99
+    },
+
+    "Parameters" : {
+        "gamma" : "1/14",
+        "r0" : "18"
+    },
+
+    "Reactions" : [
+        {
+            "r0 * gamma * S * I / (S+I+R)" : {
+                "S" : -1,
+                "I" : 1
+            }
+        },
+        {
+            "gamma * I" : {
+                "I" : -1,
+                "R" : 1
+            }
+        }
+    ]
+}

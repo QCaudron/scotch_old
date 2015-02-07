@@ -100,17 +100,7 @@ def gillespie(model, tmax, track=False, incremental=False) :
 
 
 
-
-
-
-<<<<<<< HEAD
-def tauLeap(model, tmax, tau=1) :
-=======
-
-
-
 def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
->>>>>>> FETCH_HEAD
 
 	# Initialise
 	t = [0]
@@ -120,6 +110,10 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 
 	# Start the progress bar
 	helpers.progBarStart()
+
+	if track:
+		tracked_trans_array = np.zeros((len(model.reactions),int(tmax/tau)))
+		counter = 0
 
 
 	"""
@@ -167,9 +161,12 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 		else :
 			t.append(t[-1] + tau)
 
+		
+		#record tracked reactions
+		tracked_trans_array[:,counter] = doneReactions
 		#print model.reactions
 		#print doneReactions*model.transition
-		print np.sum(model.transition * doneReactions, axis=1)
+		#print np.sum(model.transition * doneReactions, axis=1)
 
 
 		# # Check if model is tracking states

@@ -277,16 +277,29 @@ class model(object) :
 		self.parameters = { p : raw_input("%s : " % p) for p in params }
 
 		# State transitions
-		reaction = []
-		self.reactions = []
-		print "\nReactions, as <from>, <to>, <rate> triplets :"
+		event = []
+		self.events = []
+		print "\nEvents, as \"<rate>, <state_change>, ...\" lists, with commas between state changes and X+1, Y-1 as example changes :"
 		while True :
-			reaction = raw_input().split(",")
-			if len(reaction) != 3 :
-				break
-			self.reactions.append(tuple([reaction[0].strip(), 
-										 reaction[1].strip(), 
-										 reaction[2].strip()]))
+			
+			# Grab user input of one event
+			event = raw_input().split(",")
+			if event == [""] : # if they hit Enter
+				break # stop reading in events
+
+			thisevent = {}
+			for e in event[1:] :
+				if "+" in e :
+					st, quant = e.split("+")
+					quant = int(quant)
+				elif "-" in e :
+					st, quant = e.split("-")
+					quant = -int(quant)
+				else :
+					raise helpers.InvalidModel("The syntax of this event was not recognised.")
+				thisevent[st.strip()] = quant
+
+			events.append([event[0].strip(), thisevent])
 
 		# Model variables
 		self.build()

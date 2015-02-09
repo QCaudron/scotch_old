@@ -166,16 +166,14 @@ class model(object) :
 
 		# Model variables
 		self.N_states = len(self.states)
-		self.N_reactions = len(self.reactions)
+		self.N_events = len(self.events)
 		self.states_map = { i : idx for i, idx in zip(self.states, range(self.N_states)) }
 
 		# Transition matrix
-		self.transition = np.zeros((self.N_states, self.N_reactions), dtype=int)
-		for i, val in enumerate(self.reactions) :
-			if val[0] in self.states :
-				self.transition[self.states_map[val[0]], i] = -1
-			if val[1] in self.states :
-				self.transition[self.states_map[val[1]], i] = 1
+		self.transition = np.zeros((self.N_states, self.N_events), dtype=int)
+		for idx, e in enumerate(self.events) :
+			for i in e[1] :
+				self.transition[self.state_map[i], idx] = e[1][i]
 
 		# State vector
 		self.X = np.zeros(self.N_states)

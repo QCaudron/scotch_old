@@ -1,0 +1,34 @@
+{
+    "Events" : [
+        [
+            "beta*S*I",
+            {
+                "I" : 1,
+                "S" : -1
+            }
+        ],
+        [
+            "gamma*I",
+            {
+                "I" : -1,
+                "R" : 1
+            }
+        ]
+    ],
+    "Filename" : "scotch_model.json",
+    "InitialConditions" : {
+        "I" : 1,
+        "R" : 0,
+        "S" : 100
+    },
+    "Parameters" : {
+        "beta" : ".2",
+        "gamma" : "4"
+    },
+    "States" : [
+        "S",
+        "I",
+        "R"
+    ],
+    "default_algorithm" : "simulate.gillespie"
+}

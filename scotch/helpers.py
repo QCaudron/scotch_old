@@ -8,7 +8,7 @@ import numpy as np
 required = ["States", 
 			"Parameters",
 			"InitialConditions",
-			"Reactions"]
+			"Events"]
 
 
 
@@ -107,13 +107,51 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 
+def trackIndividuals(model, tracking_array, t) :
+	# Initialize dictionary of arrays by state
+	statesDict = {}
+	for s in model.states :
+		statesDict[s] = []
+
+	
+
+	# Input initial conditions
+	lastID = 0
+
+	for key in statesDict.keys() :
+		if model.initconds[key] >0 :
+			statesDict[key].append(range(lastID, lastID+model.initconds[key]))
+			lastID = lastID+model.initconds[key]
+		else :
+			statesDict[key].append([])
+
+	
+	
+	for idx, val in enumerate(t[:-1]) :
+		for idx2, val2 in enumerate(tracking_array[:,idx]) :
+			#calculate how many transitions to do 
+			numIDs_to_move = model.transition[:,idx2]*val2
+			for idx3, val3 in enumerate(numIDs_to_move) :
+				x = statesDict[model.states[idx3]][-1]
+				if val3 < 0 :
+					#remove
+					for i in np.random.choice(x,np.abs(val3),replace=False) :
+						x.remove(i)
+				elif val3 > 0 :
+					for i in range(int(val3)) :
+						lastID+=1
+						x.append(lastID)
+				statesDict[model.states[idx3]].append(x)
+
+						
+	return statesDict
 
 
 
 
-def trackIndividuals(model, individuals, transition, t, incremental=False) :
+# def trackIndividuals(model, individuals, transition, t, incremental=False) :
 
-	pass
+# 	pass
 
 
 

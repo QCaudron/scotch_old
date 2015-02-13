@@ -32,12 +32,12 @@ class model(object) :
 			self.states = [] # State variables
 			self.initconds = {} # Initial conditions
 			self.parameters = {} # Parameters
-			self.reactions = [] # Reactions
+			self.events = [] # Events
 			self.optional = { "default_algorithm" : "simulate.gillespie" } # Optional fields, like dataset, save name, ...
 			self.states_map = {} # Map between state symbols and vector notation
 			self.transition = None # Transition matrix
-			self.tracked_states = None #State variables to be tracked during simulation
-			self.tracked_trans = None #Transitions to be tracked during simulation
+			# self.tracked_states = None #State variables to be tracked during simulation
+			# self.tracked_trans = None #Transitions to be tracked during simulation
 
 
 
@@ -62,7 +62,7 @@ class model(object) :
 			self.states = model["States"]
 			self.initconds = model["InitialConditions"]
 			self.parameters = model["Parameters"]
-			self.reactions = model["Reactions"]
+			self.events = model["Events"]
 
 			# Read in optional data
 			missing = list(set(model).difference(helpers.required)) # additional fields
@@ -84,8 +84,8 @@ class model(object) :
 
 		out = ""
 
-		for r in self.reactions :
-			out += ("%s -> %s, rate %s\n" % (r[0], r[1], r[2]))
+		for e in self.events :
+			out += ("rate %s\n" % (e[0]))
 
 		return out
 
@@ -97,7 +97,7 @@ class model(object) :
 	# Long representation of model objects
 	def __str__(self) :
 
-		out = ("scotch.scotch.model with %d states, %d parameters, and %d reactions.\n" % (self.N_states, len(self.parameters), self.N_reactions))
+		out = ("scotch.scotch.model with %d states, %d parameters, and %d events.\n" % (self.N_states, len(self.parameters), self.N_events))
 		out += "\nStates :\n"
 
 		for s in self.states :
@@ -108,10 +108,10 @@ class model(object) :
 		for p, v in self.parameters.items() :
 			out += ("%s = %s\n" % (p, v))
 
-		out += "\nReactions :\n"
+		out += "\nEvents :\n"
 		count = 0
-		for r in self.reactions :
-			out += ("Number %s: %s -> %s,\trate %s\n" % (count,r[0], r[1], r[2]))
+		for e in self.events :
+			out += ("Number %s: \tprobability %s\n" % (count,e[0]))
 			count +=1
 
 		return out
@@ -140,7 +140,7 @@ class model(object) :
 		out = { "States" : self.states,
 				"InitialConditions" : self.initconds,
 				"Parameters" : self.parameters,
-				"Reactions" : self.reactions }
+				"Events" : self.events }
 		
 		# Add optional fields if any exist
 		for optional_field, optional_value in self.optional.items() :
@@ -173,7 +173,8 @@ class model(object) :
 		self.transition = np.zeros((self.N_states, self.N_events), dtype=int)
 		for idx, e in enumerate(self.events) :
 			for i in e[1] :
-				self.transition[self.state_map[i], idx] = e[1][i]
+				self.transition[self.states_map[i], idx] = e[1][i]
+
 
 		# State vector
 		self.X = np.zeros(self.N_states)
@@ -182,17 +183,18 @@ class model(object) :
 
 		# Transition rate functions
 		self.rates = []
-		for i, val in enumerate(self.reactions) :
-			self.rates.append(eval("lambda X : %s" % helpers.parse(val[2], self.states_map, self.parameters)))
+		for e in self.events :
+			self.rates.append(eval("lambda X : %s" % helpers.parse(e[0], self.states_map, self.parameters)))
 
-		# Rewrite states as not unicode
-		for idx,s in enumerate(self.states) :
-			self.states[idx] = s.encode("utf-8")
+		# # Rewrite states as not unicode
+		# for idx,s in enumerate(self.states) :
+		# 	self.states[idx] = s.encode("utf-8")
 
-		# Rewrite reactions as not unicode
-		for idx1, r in enumerate(self.reactions) :
-			for idx2,r2 in enumerate(r) :
-				self.reactions[idx1][idx2] = r[idx2].encode("utf-8")
+		# # Rewrite reactions as not unicode
+		# for idx1, r in enumerate(self.events) :
+		# 	self.events[idx1][0]=r[0].encode("utf-8")
+		# 	for item in r[1].keys() :
+		# 		self.events[1][idx2] = r[idx2].encode("utf-8")
 
 
 		# print "Would you like to track any reactions? (y/n)"
@@ -297,7 +299,7 @@ class model(object) :
 					raise helpers.InvalidModel("The syntax of this event was not recognised.")
 				thisevent[st.strip()] = quant
 
-			events.append([event[0].strip(), thisevent])
+			self.events.append([event[0].strip(), thisevent])
 
 		# Model variables
 		self.build()

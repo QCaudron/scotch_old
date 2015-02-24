@@ -107,7 +107,7 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 
-def trackIndividuals(model, tracking_array, t) :
+def trackIndividuals(model, tracking_array, t, keepIndividuals = True) :
 	# Initialize dictionary of arrays by state
 	statesDict = {}
 	for s in model.states :
@@ -121,27 +121,83 @@ def trackIndividuals(model, tracking_array, t) :
 	for key in statesDict.keys() :
 		if model.initconds[key] >0 :
 			statesDict[key].append(range(lastID, lastID+model.initconds[key]))
-			lastID = lastID+model.initconds[key]
+			lastID += model.initconds[key]
 		else :
 			statesDict[key].append([])
 
-	
-	
-	for idx, val in enumerate(t[:-1]) :
-		for idx2, val2 in enumerate(tracking_array[:,idx]) :
-			#calculate how many transitions to do 
-			numIDs_to_move = model.transition[:,idx2]*val2
-			for idx3, val3 in enumerate(numIDs_to_move) :
-				x = statesDict[model.states[idx3]][-1]
-				if val3 < 0 :
-					#remove
-					for i in np.random.choice(x,np.abs(val3),replace=False) :
-						x.remove(i)
-				elif val3 > 0 :
-					for i in range(int(val3)) :
-						lastID+=1
-						x.append(lastID)
-				statesDict[model.states[idx3]].append(x)
+
+	# Check if user wants to keep ids between states or not
+	# do something about source and sink states
+	if keepIndividuals:
+		#Go through each time step
+		for idx, val in enumerate(t[:-1]) :
+			# reset matrix of number of IDs to move (number of events by number of states)
+			numIDs_to_move = np.zeros((model.N_events, model.N_states))
+			for idx2, val2 in enumerate(tracking_array[:,idx]) :
+				#calculate how many transitions to do          
+				numIDs_to_move[idx2,:] = model.transition[:,idx2]*val2
+			# set up temporary list of ids in the latest timestep for each state
+			temp_stateDict = [ list(statesDict[x][-1]) for x in model.states] 
+			# go through each event and move ids to/from appropriate states      
+			for idx2,item2 in enumerate(numIDs_to_move) :
+				# go through each state in order and remove or add items
+				# need to always take IDS from  losing state first
+				# get IDs being taken away
+				#first check if any subtractions happen
+				if all(i >=0 for i in item2) and not all(i == 0 for i in item2):
+					#if not, generate new ids to add to state where things get added
+					state_idx_add = np.where(item2 > 0)[0]
+					for i in range(int(item2[state_idx_add])) :
+						lastID +=1
+				        temp_stateDict[state_idx_add].append(lastID)
+				elif not all(i == 0 for i in item2):
+					state_idx_remove = np.where(item2 < 0)[0]
+					num_items_to_move = item2[state_idx_remove]
+					ids_to_move = []
+					for i in np.random.choice(temp_stateDict[state_idx_remove],np.abs(num_items_to_move),replace=False) :
+					    ids_to_move.append(i)
+					    temp_stateDict[state_idx_remove].remove(i)
+					#add IDs to state that gets incremented    
+					state_idx_add = np.where(item2 > 0)[0]
+					for i in ids_to_move :
+						temp_stateDict[state_idx_add].append(i)
+
+
+			for idx3, item in enumerate(model.states) :
+				statesDict[item].append(temp_stateDict[idx3])                                       
+
+	else :
+		for idx, val in enumerate(t[:-1]) :
+			# print "time index is", idx 
+			numIDs_to_move = np.zeros((model.N_events, model.N_states))
+			for idx2, val2 in enumerate(tracking_array[:,idx]) :
+				#calculate how many transitions to do 
+				# print "This many", val2,"of this transition", model.transition[:,idx2]            
+				numIDs_to_move[idx2,:] = model.transition[:,idx2]*val2
+			# print "num IDs to move is", numIDs_to_move
+			temp_stateDict = [ list(statesDict[x][-1]) for x in model.states]       
+			for idx2,item2 in enumerate(numIDs_to_move) :
+				for idx3, item3 in enumerate(item2):
+				     if item3 < 0 :
+				         # print "time index is", idx
+				         # print "temp list is", temp_stateDict[idx3]
+				         #print "trace is",trace[idx,:]
+				         #remove
+				         for i in np.random.choice(temp_stateDict[idx3],np.abs(item3),replace=False) :
+				             # print "removed id is", i
+				             temp_stateDict[idx3].remove(i)
+				     elif item3 > 0 :
+				         for i in range(int(item3)) :
+				               lastID+=1
+				               temp_stateDict[idx3].append(lastID)
+				         #       print "appended temp list is", temp_stateDict[idx3]
+				         # print "time index is", idx
+				         # print "last added item is", lastID
+	                                
+	                     
+			#print "new x for state", item, "is", x  
+			for idx, item in enumerate(model.states) :
+				statesDict[item].append(temp_stateDict[idx])                                       
 
 						
 	return statesDict

@@ -160,9 +160,10 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 		# a valid transition, and update the state space
 		if np.sum(rates) <= 0 :
 			print "Stopping early - no valid transitions !"
-			trace = np.delete(trace,range(idx,int(tmax/tau)+1),0)
-			t = np.delete(t,range(idx,int(tmax/tau)+1),0)
-			tracked_trans_array = np.delete(tracked_trans_array,range(idx,int(tmax/tau)+1),1)
+			trace = np.delete(trace,range(idx+1,int(tmax/tau)+1),0)
+			t = np.delete(t,range(idx+1,int(tmax/tau)+1),0)
+			if track:
+				tracked_trans_array = np.delete(tracked_trans_array,range(idx+1,int(tmax/tau)+1),1)
 			break
 
 		# Correct so things don't go negative :		

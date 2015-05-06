@@ -10,7 +10,7 @@ pages:
 - ["model-specs/index.md", "Model Specifications"]
 - ["model-specs/events.md", "Model Specifications", "Events"]
 - ["model-specs/states.md", "Model Specifications", "States"]
-- ["model-specs/initcond.md", "Model Specifications", "Initial Conditions"]
+- ["model-specs/initconds.md", "Model Specifications", "Initial Conditions"]
 - ["model-specs/parameters.md", "Model Specifications", "Parameters"]
 - ["model-specs/optional.md", "Model Specifications", "Optional Entries"]
 - ["documentation/index.md", "Documentation"]

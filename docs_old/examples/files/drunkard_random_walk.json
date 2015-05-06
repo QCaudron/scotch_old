@@ -1,0 +1,28 @@
+{
+    "Events" : [
+        [
+            "p",
+            {
+                "X" : 1
+            }
+        ],
+        [
+            "q",
+            {
+                "X" : -1
+            }
+        ]
+    ],
+    "Filename" : "/Users/qcaudron/repositories/scotch/docs/examples/drunkard_random_walk.json",
+    "InitialConditions" : {
+        "X" : 0
+    },
+    "Parameters" : {
+        "p" : "0.5",
+        "q" : "0.3"
+    },
+    "States" : [
+        "X"
+    ],
+    "default_algorithm" : "simulate.gillespie"
+}

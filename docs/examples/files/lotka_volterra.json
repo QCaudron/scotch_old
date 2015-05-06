@@ -1,0 +1,44 @@
+{
+    "Events" : [
+        [
+            "alpha * B",
+            {
+                "B" : 1
+            }
+        ],
+        [
+            "beta * F * B",
+            {
+                "B" : -1
+            }
+        ],
+        [
+            "delta * F * B",
+            {
+                "F" : 1
+            }
+        ],
+        [
+            "gamma * F",
+            {
+                "F" : -1
+            }
+        ]
+    ],
+    "Filename" : "/Users/qcaudron/repositories/scotch/docs/examples/files/lotka_volterra.json",
+    "InitialConditions" : {
+        "B" : 100,
+        "F" : 100
+    },
+    "Parameters" : {
+        "alpha" : "0.3",
+        "beta" : "0.0025",
+        "delta" : "0.0015",
+        "gamma" : "0.2"
+    },
+    "States" : [
+        "B",
+        "F"
+    ],
+    "default_algorithm" : "gillespie"
+}

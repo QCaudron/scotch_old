@@ -1,29 +1,29 @@
 {
     "Events" : [
         [
-            "beta*S*I",
+            "r0 * gamma * S * I / (S+I+R)",
             {
                 "I" : 1,
                 "S" : -1
             }
         ],
         [
-            "gamma*I",
+            "gamma * I",
             {
                 "I" : -1,
                 "R" : 1
             }
         ]
     ],
-    "Filename" : "Sample1.json",
+    "Filename" : "/Users/qcaudron/repositories/scotch/docs/examples/sir.json",
     "InitialConditions" : {
         "I" : 1,
         "R" : 0,
-        "S" : 100
+        "S" : 99
     },
     "Parameters" : {
-        "beta" : ".2",
-        "gamma" : "4"
+        "gamma" : "1/14",
+        "r0" : "18"
     },
     "States" : [
         "S",

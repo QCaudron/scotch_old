@@ -40,6 +40,7 @@ def parse(S, states_map=[], params=[]) :
     
     # Operators
 	symbols = ["+", "-", "*", "/", "(", ")", "#"]
+	operations = ["sin", "cos", "exp", "log", "pi", "tan"]
 
 	S = S.replace(" ", "") + "#"
     
@@ -76,9 +77,14 @@ def parse(S, states_map=[], params=[]) :
 
     # Remove trailing token
 	out.remove("#")
+
+	# Do some numpy stuffs
+	out = "".join(out)
+	for operation in operations :
+		out = out.replace("float(%s)" % operation, "np.%s" % operation)
     
     # Return a string that should fit in eval()
-	return "".join(out)
+	return out
 
 
 

@@ -3,8 +3,19 @@ import json
 import os
 import numpy as np
 
+"""
+try :
+	import pyximport
+	pyximport.install(setup_args={"include_dirs":np.get_include()})
+	import simulate_cython as simulate
+	print "Imported Cython version"
+except ImportError :
+	import simulate
+"""
 import helpers
 import simulate
+
+
 
 
 
@@ -33,7 +44,7 @@ class model(object) :
 			self.initconds = {} # Initial conditions
 			self.parameters = {} # Parameters
 			self.events = [] # Events
-			self.optional = { "default_algorithm" : "simulate.gillespie" } # Optional fields, like dataset, save name, ...
+			self.optional = { "default_algorithm" : "gillespie" } # Optional fields, like dataset, save name, ...
 			self.states_map = {} # Map between state symbols and vector notation
 			self.transition = None # Transition matrix
 			# self.tracked_states = None #State variables to be tracked during simulation
@@ -97,7 +108,7 @@ class model(object) :
 	# Long representation of model objects
 	def __str__(self) :
 
-		out = ("scotch.scotch.model with %d states, %d parameters, and %d events.\n" % (self.N_states, len(self.parameters), self.N_events))
+		out = ("scotch model with %d states, %d parameters, and %d events.\n" % (self.N_states, len(self.parameters), self.N_events))
 		out += "\nStates :\n"
 
 		for s in self.states :
@@ -107,12 +118,6 @@ class model(object) :
 
 		for p, v in self.parameters.items() :
 			out += ("%s = %s\n" % (p, v))
-
-		out += "\nEvents :\n"
-		count = 0
-		for e in self.events :
-			out += ("Number %s: \tprobability %s\n" % (count,e[0]))
-			count +=1
 
 		return out
 
@@ -184,7 +189,7 @@ class model(object) :
 		# Transition rate functions
 		self.rates = []
 		for e in self.events :
-			self.rates.append(eval("lambda X : %s" % helpers.parse(e[0], self.states_map, self.parameters)))
+			self.rates.append(eval("lambda X, time : %s" % helpers.parse(e[0], self.states_map, self.parameters)))
 
 		# # Rewrite states as not unicode
 		# for idx,s in enumerate(self.states) :
@@ -310,7 +315,7 @@ class model(object) :
 
 
 
-	def plot(self, T, algorithm=simulate.gillespie) :
+	def plot(self, T, **kwargs) :
 
 		import matplotlib.pyplot as plt
 		try :
@@ -318,7 +323,7 @@ class model(object) :
 		except :
 			pass
 
-		t, trace = simulate.gillespie(self, T)
+		t, trace = self.simulate(T, **kwargs)
 		plt.plot(t, trace)
 		plt.legend(self.states)
 		plt.show()
@@ -337,8 +342,12 @@ class model(object) :
 		}
 
 
+		# Parameters to pass
+		parameters = {}
+
+
 		# Determine algorithm
-		algorithm = kwargs.get("algorithm", eval("simulate." + self.optional["default_algorithm"]))
+		algorithm = eval("simulate." + kwargs.get("algorithm", self.optional["default_algorithm"]))
 
 		
 		# If not Gillespie, check that required parameters are present
@@ -346,17 +355,86 @@ class model(object) :
 			if algorithm == algo :
 				for p in params :
 					assert p in kwargs, "The parameter %s is required for the %s algorithm." % (p, algo)
+					parameters[p] = kwargs[p]
 
 
-		# Are we tracking individuals ?
-		tracking = kwargs.get("track", False)
-		if tracking :
-			incremental = kwargs.get("incremental", False)
+		# Run the algorithm
+		if len(parameters) :
+			return algorithm(self, T, **parameters)
+		else :
+			return algorithm(self, T)
 
 
 
 
 
+
+
+
+
+
+
+	def sample(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, sumstats=True, **kwargs) :
+
+		from scipy.interpolate import interp1d
+
+		# Sample repeatedly from the model and potentially return summary statistics only
+		all_t = []
+		all_trace = []
+
+		for traj in range(trajectories) :
+			
+			# Simulate the model
+			t, trace = self.simulate(T, **kwargs)
+
+			# Append the time and traces to our arrays
+			all_t.append(t)
+			all_trace.append(trace)	
+
+
+		# For each state variable, interpolate
+		int_t = np.linspace(0, T, tvals)
+		int_trace = {}
+
+		for dim_num, dim in enumerate(self.states) :
+			int_trace[dim] = []
+
+			for x, y in zip(all_t, all_trace) :
+				t = np.append(x, T)
+				trace = np.append(y[:, dim_num], np.nan)
+				int_trace[dim].append(interp1d(t, trace)(int_t))
+
+			int_trace[dim] = np.array(int_trace[dim])
+
+
+		# Calculate the mean
+		m = { dim : np.nanmean(int_trace[dim], axis=0) for dim in self.states }
+
+
+
+		# Bootstrap some 95% confidence intervals :
+		means = {}
+
+		# Draw a number of realisations with replacement
+		idx = np.random.randint(0, trajectories, (bootstraps, trajectories))
+
+		# For each dimension in the state space
+		for dim in self.states :
+			means[dim] = []
+			
+			# and for each bootstrap iteration
+			for i in idx :
+				# Calculate the means of this iteration
+				means[dim].append(np.nanmean(int_trace[dim][i], axis=0))
+
+			# After doing all iterations, sort the means
+			means[dim] = np.sort(np.array(means[dim]), axis=0)
+
+		# Extract intervals
+		ci_low = { dim : means[dim][int(alpha*bootstraps/2.)] for dim in self.states }
+		ci_high = { dim : means[dim][int(1.-alpha*bootstraps/2.)] for dim in self.states }
+
+		return int_t, m, ci_low, ci_high
 
 
 

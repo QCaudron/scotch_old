@@ -1,0 +1,75 @@
+{
+    "Events" : [
+        [
+            "mu * (S+E+I+R)",
+            {
+                "S" : 1
+            }
+        ],
+        [
+            "mu * S",
+            {
+                "S" : -1
+            }
+        ],
+        [
+            "mu * E",
+            {
+                "E" : -1
+            }
+        ],
+        [
+            "mu * I",
+            {
+                "I" : -1
+            }
+        ],
+        [
+            "mu * R",
+            {
+                "R" : -1
+            }
+        ],
+        [
+            "r0 * gamma * S * I / (S+E+I+R)",
+            {
+                "E" : 1,
+                "S" : -1
+            }
+        ],
+        [
+            "sigma * E",
+            {
+                "E" : -1,
+                "I" : 1
+            }
+        ],
+        [
+            "gamma * I",
+            {
+                "I" : -1,
+                "R" : 1
+            }
+        ]
+    ],
+    "Filename" : "/Users/qcaudron/repositories/scotch/docs/examples/seir_births_deaths.json",
+    "InitialConditions" : {
+        "E" : 1,
+        "I" : 0,
+        "R" : 0,
+        "S" : 999
+    },
+    "Parameters" : {
+        "gamma" : "1/7",
+        "mu" : "0.05",
+        "r0" : "18",
+        "sigma" : "1/7"
+    },
+    "States" : [
+        "S",
+        "E",
+        "I",
+        "R"
+    ],
+    "default_algorithm" : "gillespie"
+}

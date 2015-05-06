@@ -1,23 +1,26 @@
 # Simulation algorithms
 import numpy as np
+cimport numpy as np
 import helpers
+
+DTYPE = np.int
+ctypedef np.int_t DTYPE_t
 
 
 
 
 # Gillespie algorithm
-def gillespie(model, tmax, track=False, incremental=False) :
+cpdef gillespie(model, double tmax, bint track=False, bint incremental=False) :
 
 	# Initialise
-	t = [0]
+	cdef list t = [0]
 	model.build(silent=True) # initialise model
-	trace = model.X[:]
-
-
+	cdef np.ndarray trace = model.X[:]
+	cdef list rates = []
 
 	# Generate this many random uniforms at once, for speed
-	randsize = 1000
-	tlast = 0
+	cdef int randsize = 1000
+	cdef int tlast = 0
 
 	# Pre-allocate matrix of tracked reactions
 	if track:
@@ -25,11 +28,13 @@ def gillespie(model, tmax, track=False, incremental=False) :
 		tcount = 0
 
 	# Pregenerate some random numbers
-	rand = np.random.uniform(size=1000)
-	rcount = 0
+	cdef np.ndarray rand = np.random.uniform(size=1000)
+	cdef int rcount = 0
 
 	# Start the progress bar
 	#helpers.progBarStart()
+
+
 
 
 
@@ -37,7 +42,7 @@ def gillespie(model, tmax, track=False, incremental=False) :
 	while t[-1] < tmax :
 
 		# Compute a rates vector
-		rates = [rate(model.X, t[-1]) for rate in model.rates]
+		rates = [rate(model.X) for rate in model.rates]
 
 
 		# Determine which event occurred after ensuring that there's 
@@ -131,7 +136,7 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 	for idx, time in enumerate(t[:-1]):
 
 		# Compute a rates vector 
-		rates = [rate(model.X, time) for rate in model.rates]
+		rates = [rate(model.X) for rate in model.rates]
 
 		assert (np.array(rates) < 0).sum() == 0, "Negative rates, you die now. % s" % rates
 
@@ -146,7 +151,7 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 			break
 
 		# Correct so things don't go negative :		
-		maxEvents = np.array([(model.X[i] if len(i) == 1 else np.inf) for i in cappedEvents])
+		maxEvents = np.array([model.X[i] if len(i) == 1 else np.inf for i in cappedEvents], dtype=int)[:, 0]
 
 		# Determine the number of times each transition happens in tau time
 		estEvents = np.array([np.random.poisson(rate * tau) for rate in rates], dtype=int)

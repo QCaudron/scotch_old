@@ -107,7 +107,7 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 
-def trackIndividuals(model, tracking_array, t, keepIndividuals = True) :
+def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackActors = False) :
 	# Initialize dictionary of arrays by state
 	statesDict = {}
 	for s in model.states :
@@ -125,21 +125,46 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = True) :
 		else :
 			statesDict[key].append([])
 
+	if trackActors :
+		actorPairsDict = {}
+		for x in model.events :
+			actorPairsDict[x[0]] = []
+
+
 
 	# Check if user wants to keep ids between states or not
 	# do something about source and sink states
 	if keepIndividuals:
 		#Go through each time step
 		for idx, val in enumerate(t[:-1]) :
+			# print("Time is")
+			# print(val)
 			# reset matrix of number of IDs to move (number of events by number of states)
 			numIDs_to_move = np.zeros((model.N_events, model.N_states))
 			for idx2, val2 in enumerate(tracking_array[:,idx]) :
 				#calculate how many transitions to do          
 				numIDs_to_move[idx2,:] = model.transition[:,idx2]*val2
+			# print("numIDs_to_move is")
+			# print(numIDs_to_move)
+
+
 			# set up temporary list of ids in the latest timestep for each state
 			temp_stateDict = [ list(statesDict[x][-1]) for x in model.states] 
+			if trackActors :
+				#set up temporary list of actor pairs per timestep
+				temp_actorPairsList = {i:[] for i in model.optional['actors'].keys()}
+			
 			# go through each event and move ids to/from appropriate states      
 			for idx2,item2 in enumerate(numIDs_to_move) :
+				# check if there are actors
+				eventActors = False
+				if trackActors:
+					if not (model.optional['actors'][model.events[idx2][0]] == '[]'):
+						eventActors = True
+
+
+						
+
 				# go through each state in order and remove or add items
 				# need to always take IDS from  losing state first
 				# get IDs being taken away
@@ -149,22 +174,44 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = True) :
 					state_idx_add = np.where(item2 > 0)[0]
 					for i in range(int(item2[state_idx_add])) :
 						lastID +=1
-				        temp_stateDict[state_idx_add].append(lastID)
+						if trackActors and eventActors:
+							
+							#add pair of actors to temp dict
+							#get random actor from actor class by 
+							#choosing random ID from corresponding temp_stateDict
+							increment_actors_dict(model, temp_actorPairsList ,idx2, lastID,temp_stateDict)
+							
+				    	temp_stateDict[state_idx_add].append(lastID)
 				elif not all(i == 0 for i in item2):
 					state_idx_remove = np.where(item2 < 0)[0]
 					num_items_to_move = item2[state_idx_remove]
 					ids_to_move = []
 					for i in np.random.choice(temp_stateDict[state_idx_remove],np.abs(num_items_to_move),replace=False) :
 					    ids_to_move.append(i)
+					    if trackActors and eventActors:
+							
+						#add pair of actors to temp dict
+						#get random actor from actor class by 
+						#choosing random ID from corresponding temp_stateDict
+							increment_actors_dict(model, temp_actorPairsList ,idx2, i, temp_stateDict)
+							# print temp_actorPairsList
+
 					    temp_stateDict[state_idx_remove].remove(i)
 					#add IDs to state that gets incremented    
 					state_idx_add = np.where(item2 > 0)[0]
 					for i in ids_to_move :
 						temp_stateDict[state_idx_add].append(i)
+													
+					
 
 
 			for idx3, item in enumerate(model.states) :
-				statesDict[item].append(temp_stateDict[idx3])                                       
+				statesDict[item].append(temp_stateDict[idx3])  
+				
+			if trackActors:
+				for item in model.events:
+					actorPairsDict[item[0]].append(temp_actorPairsList[item[0]]) 
+					                                  
 
 	else :
 		for idx, val in enumerate(t[:-1]) :
@@ -172,16 +219,14 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = True) :
 			numIDs_to_move = np.zeros((model.N_events, model.N_states))
 			for idx2, val2 in enumerate(tracking_array[:,idx]) :
 				#calculate how many transitions to do 
-				# print "This many", val2,"of this transition", model.transition[:,idx2]            
+				
 				numIDs_to_move[idx2,:] = model.transition[:,idx2]*val2
-			# print "num IDs to move is", numIDs_to_move
+			
 			temp_stateDict = [ list(statesDict[x][-1]) for x in model.states]       
 			for idx2,item2 in enumerate(numIDs_to_move) :
 				for idx3, item3 in enumerate(item2):
 				     if item3 < 0 :
-				         # print "time index is", idx
-				         # print "temp list is", temp_stateDict[idx3]
-				         #print "trace is",trace[idx,:]
+				         
 				         #remove
 				         for i in np.random.choice(temp_stateDict[idx3],np.abs(item3),replace=False) :
 				             # print "removed id is", i
@@ -190,24 +235,55 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = True) :
 				         for i in range(int(item3)) :
 				               lastID+=1
 				               temp_stateDict[idx3].append(lastID)
-				         #       print "appended temp list is", temp_stateDict[idx3]
-				         # print "time index is", idx
-				         # print "last added item is", lastID
-	                                
-	                     
-			#print "new x for state", item, "is", x  
+				               if trackActors and eventActors:
+									increment_actors_dict(model, temp_actorPairsList ,idx2, i, temp_stateDict)
+								
+				      
 			for idx, item in enumerate(model.states) :
-				statesDict[item].append(temp_stateDict[idx])                                       
+				statesDict[item].append(temp_stateDict[idx])     
+				#go through temp dictionary of actor pairs and append the ones for this time step
+			if trackActors and eventActors:
+				for item in model.events:
+					actorPairsDict[item[0]].append(temp_actorPairsList[item[0]])
+					                                
+    
+    #Sort IDs in statesDict                              
+	for x in model.states:
+		for y in statesDict[x]:
+			y.sort()
 
-						
-	return statesDict
+	if trackActors: 
+		for x in model.events:
+			for y in actorPairsDict[x[0]]:
+				y.sort(key = lambda tup: (tup[0],tup[1])) 					
+		return statesDict, actorPairsDict
+	else :
+		return statesDict
 
 
 
 
-# def trackIndividuals(model, individuals, transition, t, incremental=False) :
+def add_actors_wizard(model) :
 
-# 	pass
+	actors = {};
+	print "This wizard will help assign states as actors for each events"
+	print "The states to choose from are", [x.encode('utf8') for x in model.states] 
+	for x in model.events :
+		print "Enter actor for the following event (enter '[]' without quotes if no actor)\n",x[0].encode('utf8')
+		temp_actor = raw_input().strip()
+		while (temp_actor not in model.states and temp_actor != '[]')  :
+			print "Please re-enter a valid state:"
+			temp_actor = raw_input().strip()
+		actors[x[0]] = temp_actor
 
+	model.optional["actors"] = actors
 
+def increment_actors_dict(model, temp_actorPairsDict,idx, acteeID,temp_stateDict) :
+	
+	tempActor = model.optional['actors'][model.events[idx][0]]
+	if not (tempActor == '[]'):
+		tempActorID = np.random.choice(temp_stateDict[model.states_map[tempActor]])
+		
+		temp_actorPairsDict[model.events[idx][0]].append((tempActorID,acteeID))
+		
 

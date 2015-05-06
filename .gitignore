@@ -5,3 +5,5 @@ scotch.egg-info
 site/
 other/
 *_old/
+.ipynb_checkpoints
+docs_old/

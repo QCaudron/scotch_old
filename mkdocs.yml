@@ -6,6 +6,6 @@ use_directory_urls: true
 
 pages:
 - ["index.md", "scotch"]
-- ["quick-start/index.md", "Quick-Start", "Quick-Start"]
-- ["examples/random_walk.md", "Examples", "Random Walker"]
+- ["quick-start/index.md", "Quick-Start", "Quick-Start : The SIR model"]
+- ["examples/random_walk.md", "Examples", "Whisky-Fuelled Random Walker"]
 - ["examples/lotka_volterra.md", "Examples", "Lotka-Volterra"]

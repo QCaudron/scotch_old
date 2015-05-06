@@ -6,11 +6,6 @@ use_directory_urls: true
 
 pages:
 - ["index.md", "scotch"]
-- ["scotch/quickstart.md", "scotch", "Quick Start"]
-- ["scotch/scotch_models.md", "scotch", "Describing scotch models"]
-- ["scotch/simulation_algorithms.md", "scotch", "Simulation"]
-- ["markov_processes/ctmc.md", "Markov Chains", "Continuous-time Markov Chains"]
-- ["markov_processes/algorithms.md", "Markov Chains", "Simulation algorithms"]
-- ["examples/random_walk.md", "Examples", "1. Whisky-Fuelled Random Walk"]
-- ["examples/lotka_volterra.md", "Examples", "2. Lotka-Volterra Equations"]
-- ["examples/seir.md", "Examples", "3. SEIR Epidemic Model"]
+- ["quick-start/index.md", "Quick-Start", "Quick-Start"]
+- ["examples/random_walk.md", "Examples", "Random Walker"]
+- ["examples/lotka_volterra.md", "Examples", "Lotka-Volterra"]

@@ -4,3 +4,4 @@ scotch.egg-info
 *.pyc
 site/
 other/
+*_old/

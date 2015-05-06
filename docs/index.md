@@ -12,7 +12,6 @@ _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch*
 - **Model Specifications** : the full specs for _scotch_ model files.
 - **Documentation** : docs for model building, simulating, sampling, and plotting _scotch_ systems.
 - **Examples** : a series of example _scotch_ models that work out of the box.
-- **Algorithms** : details on the algorithms implemented by _scotch_.
 
 
 

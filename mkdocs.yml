@@ -6,6 +6,16 @@ use_directory_urls: true
 
 pages:
 - ["index.md", "scotch"]
-- ["quick-start/index.md", "Quick-Start", "Quick-Start : The SIR model"]
+- ["quick-start/index.md", "Quick-Start"]
+- ["model-specs/index.md", "Model Specifications"]
+- ["model-specs/events.md", "Model Specifications", "Events"]
+- ["model-specs/states.md", "Model Specifications", "States"]
+- ["model-specs/initcond.md", "Model Specifications", "Initial Conditions"]
+- ["model-specs/parameters.md", "Model Specifications", "Parameters"]
+- ["model-specs/optional.md", "Model Specifications", "Optional Entries"]
+- ["documentation/index.md", "Documentation"]
+- ["documentation/model.md", "Documentation", "Model API"]
+- ["documentation/algorithms.md", "Documentation", "Simulation Algorithms"]
+- ["documentation/tracking.md", "Documentation", "Event Tracking"]
 - ["examples/random_walk.md", "Examples", "Whisky-Fuelled Random Walker"]
 - ["examples/lotka_volterra.md", "Examples", "Lotka-Volterra"]

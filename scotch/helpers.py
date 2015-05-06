@@ -113,6 +113,10 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 
+
+
+
+
 def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackActors = False) :
 	# Initialize dictionary of arrays by state
 	statesDict = {}
@@ -269,6 +273,10 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 
 
 
+
+
+
+
 def add_actors_wizard(model) :
 
 	actors = {};
@@ -283,6 +291,13 @@ def add_actors_wizard(model) :
 		actors[x[0]] = temp_actor
 
 	model.optional["actors"] = actors
+
+
+
+
+
+
+
 
 def increment_actors_dict(model, temp_actorPairsDict,idx, acteeID,temp_stateDict) :
 	

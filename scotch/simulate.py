@@ -6,7 +6,7 @@ import helpers
 
 
 # Gillespie algorithm
-def gillespie(model, tmax, track=False, incremental=False) :
+def gillespie(model, tmax, track=False) :
 
 	# Initialise
 	t = [0]
@@ -29,7 +29,7 @@ def gillespie(model, tmax, track=False, incremental=False) :
 	rcount = 0
 
 	# Start the progress bar
-	#helpers.progBarStart()
+	helpers.progBarStart()
 
 
 
@@ -62,7 +62,6 @@ def gillespie(model, tmax, track=False, incremental=False) :
 			tcount += 1
 			if tcount >= tracked_trans_array.shape[1] :
 				tracked_trans_array = np.hstack((tracked_trans_array, np.zeros((model.N_events,randsize))))
-		#	if incremental :
 
 		
 		# At the end of randsize iterations, update randsize "adaptively"
@@ -80,7 +79,7 @@ def gillespie(model, tmax, track=False, incremental=False) :
 
 
 		# Update progress bar
-		#helpers.progBarUpdate(t[-2:], tmax)
+		helpers.progBarUpdate(t[-2:], tmax)
 
 
 	# Reset state space
@@ -94,7 +93,15 @@ def gillespie(model, tmax, track=False, incremental=False) :
 
 
 
-def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
+
+
+
+
+
+
+
+
+def tauLeap(model, tmax, tau=1, track=False) :
 
 	# Initialise
 	model.build(silent=True) # initialise model
@@ -110,18 +117,6 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 	if track:
 		tracked_trans_array = np.zeros((model.N_events,int(tmax/tau)))
 		counter = 0
-		#print int(tmax/tau)
-
-
-	"""
-	# If we're tracking individuals, generate IDs for everyone
-	if track :
-		maxID = 0
-		individuals = {}
-		for i, state in enumerate(model.states) :
-			individuals[state] = range(maxID, maxID + model.X[i])
-			maxID += model.X[i]
-	"""
 
 	cappedEvents = [np.where(model.transition[:, i] == -1)[0] for i in range(model.N_events)] # reaction takes one away from here
 
@@ -133,7 +128,7 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 		# Compute a rates vector 
 		rates = [rate(model.X, time) for rate in model.rates]
 
-		assert (np.array(rates) < 0).sum() == 0, "Negative rates, you die now. % s" % rates
+		assert (np.array(rates) < 0).sum() == 0, "Negative rates found : %s" % rates
 
 		# Determine which events occurred after ensuring that there's 
 		# a valid transition, and update the state space
@@ -146,15 +141,12 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 			break
 
 		# Correct so things don't go negative :		
-		maxEvents = np.array([(model.X[i] if len(i) == 1 else np.inf) for i in cappedEvents])
+		maxEvents = np.array([(model.X[i] if len(i) == 1 else np.inf) for i in cappedEvents])[:, 0]
 
 		# Determine the number of times each transition happens in tau time
 		estEvents = np.array([np.random.poisson(rate * tau) for rate in rates], dtype=int)
 		doneEvents = np.min((maxEvents, estEvents), axis=0).astype(int)
 
-		#if not (doneEvents != estEvents).all() :
-		#	print "Some events could not take place due to small state variable."
-		#	print "Perhaps tau is too large."
 
 		# Increase time
 		# if there's at least one reaction but we can't do them all
@@ -164,50 +156,10 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 			t[idx+1] = t[idx] + tau
 
 		
-		#record tracked reactions
+		# Record tracked reactions
 		if track :
 			tracked_trans_array[:,idx] = doneEvents
-			
-			# if counter >= tracked_trans_array.shape[1] :
-			#  	tracked_trans_array = np.hstack((tracked_trans_array, np.zeros((model.N_events,1))))
 
-		#print model.reactions
-		#print doneReactions*model.transition
-		#print np.sum(model.transition * doneReactions, axis=1)
-
-
-		# # Check if model is tracking states
-		# if model.tracked_states != None :
-		# 	if int(t[-1]) > tracking_idx:
-		# 		tracking_idx+=1
-		# 		tracked_IDs = {}
-		# 	# set up vectors for states if t =0
-		# 		for s in model.tracked_states :
-		# 			tracked_IDs[s] = []
-		# 	# set up temporary dictionary to count reactions for each state
-		# 	temp_count_dict = {}
-		# 	for s in model.tracked_states :
-
-		# 		temp_count_dict[s].append
-
-		# Check if model is tracking reactions
-		
-
-			
-
-
-
-
-
-
-
-
-		# print "State space", model.X
-		# print "Done events", doneEvents
-		# print "State Space Change", np.sum(model.transition * doneEvents, axis=1)
-		# print "Est", estEvents
-		# print "Max events", maxEvents
-		# Update the state space
 		model.X += np.sum(model.transition * doneEvents, axis=1).astype(int)
 
 
@@ -216,7 +168,6 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 
 
 		# Append new state space to trace
-		#trace = np.vstack((trace, model.X))
 		trace[idx+1,:] = model.X
 
 
@@ -234,77 +185,5 @@ def tauLeap(model, tmax, tau=1, track=False, incremental=False) :
 
 
 
-# def count_tracked(tracked_state,  model, doneReactions) :
-# 	for idx, r in enumerate(model.reactions):
-# 		if r[1] == tracked_state :
-# 			count = doneReactions[idx]
-# 	return count
-
-# 	# PROBLEM :
-# 	# Max reactions should take into account total outwards stream, not just per reaction
 
 
-
-
-# def track_reactions(model, trackAll = True):
-# 	if trackAll == False:
-# 		print "Would you like to track any reactions? (y/n)"
-# 		reaction_tracker_ind = raw_input()
-# 		if reaction_tracker_ind == "y" :
-# 			print model
-# 			print "Which reactions would you like to track? (enter Reaction Numbers separated by commas)"				
-# 			incorrectReactions = True
-# 			while incorrectReactions == True:
-# 				num_tracked_trans = raw_input().split(",")					
-# 				int_tracked_trans = [int(x) for x in num_tracked_trans]
-# 				#print range(len(model.reactions))
-# 				checkset = [x for x in int_tracked_trans if x not in range(len(model.reactions))]
-# 				if checkset == []:
-# 						incorrectReactions = False
-# 				else:
-# 					print ("Error: %s  not valid reaction number(s)" % checkset)
-# 					print ("Please re-enter reaction numbers") 
-
-
-
-# 			#print incorrectReactions
-# 			model.tracked_trans = [model.reactions[x] for x in int_tracked_trans] 
-# 			#print model.tracked_trans
-# 			#generate tracked states from transitions					
-# 			model.tracked_states = []
-# 			for t in model.tracked_trans :
-# 				for t2 in t :
-# 					if (t2 in model.states and t2 not in model.tracked_states):
-# 						model.tracked_states.append(t2)
-# 		else :
-# 			print "Would you like to track any states? (y/n)"
-# 			state_tracker_ind = raw_input()
-
-# 			if state_tracker_ind == "y":
-# 				print "Which states would you like to track? (Enter state numbers separated by commas)"
-# 				for idx,state in enumerate(model.states):
-# 					print ("Number %s: %s" %(idx, state))
-# 				incorrectStates = True
-# 				while  incorrectStates == True:
-# 					num_tracked_states = raw_input().split(",")
-# 					int_tracked_states = [int(x) for x in num_tracked_states]
-# 					checkset = [x for x in int_tracked_states if x not in range(len(model.states))]
-# 					if checkset == []:
-# 						incorrectStates = False
-# 					else:
-# 						print ("Error: %s  not valid state number(s)" % checkset)
-# 						print ("Please re-enter state numbers")
-
-# 				model.tracked_states = [model.states[x] for x in int_tracked_states] 
-# 	else:
-# 		model.tracked_trans = model.reactions
-# 		model.tracked_states = model.states
-
-
-
-
-
-
-
-def sample(model, tmax, algorithm=gillespie) :
-	pass

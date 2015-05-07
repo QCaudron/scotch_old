@@ -8,7 +8,7 @@
 ## The Gillespie Algorithm
 [Gillespie's algorithm](http://en.wikipedia.org/wiki/Gillespie_algorithm), also known as the Stochastic Simulation Algorithm, was first described in 1976. It's a popular and, more importantly, exact, dynamic Monte Carlo method, used in the simulation of stochastic systems. 
 
-- DT Gillespie. [A general method for numerically simulating the stochastic time evolution of coupled chemical reactions](http://www.sciencedirect.com/science/journal/00219991). _Journal of Computational Physics_ **22**, 403-434 (1976).
+- DT Gillespie. [A general method for numerically simulating the stochastic time evolution of coupled chemical reactions](http://www.sciencedirect.com/science/article/pii/0021999176900413). _Journal of Computational Physics_ **22**, 403-434 (1976).
 - DT Gillespie. [Exact stochastic simulation of coupled chemical reactions](http://pubs.acs.org/doi/abs/10.1021/j100540a008). _Journal of Physical Chemistry_ **81**, 2340–2361 (1977)
 
 

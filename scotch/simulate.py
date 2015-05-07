@@ -174,7 +174,7 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False) :
 
 
 
-		assert (model.X < 0).sum() == 0, "Negative state space, you DIE NAO"
+		assert (model.X < 0).sum() == 0, "Negative state space ! Aborting."
 
 
 		# Append new state space to trace

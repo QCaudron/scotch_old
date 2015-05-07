@@ -284,7 +284,7 @@ class model(object) :
 
 
 
-	def simulate(self, T, silent=False, propagate=False, **kwargs) :
+	def simulate(self, T, silent=False, track=False, propagate=False, **kwargs) :
 
 		# Additional arguments for different algorithms
 		algoparams = {
@@ -311,6 +311,7 @@ class model(object) :
 		# Additional simulation parameters
 		parameters["silent"] = silent
 		parameters["propagate"] = propagate
+		parameters["track"] = track
 
 
 		# Run the algorithm
@@ -329,7 +330,7 @@ class model(object) :
 
 
 
-	def sample(self, T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95, **kwargs) :
+	def sample(self, T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95, silent=False, **kwargs) :
 
 		from scipy.interpolate import interp1d
 
@@ -337,7 +338,14 @@ class model(object) :
 		all_t = []
 		all_trace = []
 
+		if not silent :
+			print "Sampling trajectories."
+			helpers.progBarStart()
+
 		for traj in range(trajectories) :
+
+			if not silent :
+				helpers.progBarUpdate([traj-1, traj], trajectories)
 			
 			# Simulate the model
 			t, trace = self.simulate(T, silent=True, **kwargs)
@@ -345,6 +353,10 @@ class model(object) :
 			# Append the time and traces to our arrays
 			all_t.append(t)
 			all_trace.append(trace)	
+
+
+		if not silent :
+			print "\n"
 
 
 		# For each state variable, interpolate
@@ -367,27 +379,35 @@ class model(object) :
 
 
 
-		# Bootstrap some 95% confidence intervals :
-		means = {}
+		if bootstraps :
+			# Bootstrap some 95% confidence intervals :
+			means = {}
 
-		# Draw a number of realisations with replacement
-		idx = np.random.randint(0, trajectories, (bootstraps, trajectories))
+			# Draw a number of realisations with replacement
+			idx = np.random.randint(0, trajectories, (bootstraps, trajectories))
 
-		# For each dimension in the state space
-		for dim in self.states :
-			means[dim] = []
-			
-			# and for each bootstrap iteration
-			for i in idx :
-				# Calculate the means of this iteration
-				means[dim].append(np.nanmean(int_trace[dim][i], axis=0))
+			# For each dimension in the state space
+			for dim in self.states :
+				means[dim] = []
 
-			# After doing all iterations, sort the means
-			means[dim] = np.sort(np.array(means[dim]), axis=0)
+				if not silent :
+					print "Bootstrapping {}.".format(dim)
+				
+				# and for each bootstrap iteration
+				for i in idx :
+					# Calculate the means of this iteration
+					means[dim].append(np.nanmean(int_trace[dim][i], axis=0))
 
-		# Extract intervals
-		ci_low = { dim : means[dim][int((1-alpha)*bootstraps/2.)] for dim in self.states }
-		ci_high = { dim : means[dim][int(1.-(1-alpha)*bootstraps/2.)] for dim in self.states }
+				# After doing all iterations, sort the means
+				means[dim] = np.sort(np.array(means[dim]), axis=0)
+
+			# Extract intervals
+			ci_low = { dim : means[dim][int((1-alpha)*bootstraps/2.)] for dim in self.states }
+			ci_high = { dim : means[dim][int(1.-(1-alpha)*bootstraps/2.)] for dim in self.states }
+
+		else :
+			ci_low = None
+			ci_high = None
 
 		return int_t, m, ci_low, ci_high
 
@@ -400,7 +420,7 @@ class model(object) :
 
 
 
-	def plotsamples(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, **kwargs) :
+	def plotsamples(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, silent=False, **kwargs) :
 
 		import matplotlib as mpl
 		import matplotlib.pyplot as plt
@@ -412,12 +432,20 @@ class model(object) :
 		except ImportError :
 			pass
 
-		t, mean, dn, up = self.sample(T, trajectories, bootstraps, tvals, alpha, **kwargs)
+		t, mean, dn, up = self.sample(T, 
+									  trajectories=trajectories, 
+									  bootstraps=bootstraps, 
+									  tvals=tvals, 
+									  alpha=alpha, 
+									  silent=silent, 
+									  **kwargs)
+
 		for s, state in enumerate(self.states) :
 			plt.plot(t, mean[state], lw=3)
 			plt.fill_between(t, dn[state], up[state], alpha=0.4, color=C[s % 6])
 		plt.legend(self.states)
 		plt.xlabel("Time")
+		plt.xlim(0, T)
 		plt.tight_layout()
 		plt.show()
 

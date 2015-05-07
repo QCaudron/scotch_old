@@ -1,5 +1,8 @@
 # Model API
 
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.2.0/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.2.0/katex.min.js"></script>
+
 [TOC]
 
 
@@ -162,3 +165,52 @@ model.plotsamples(1000, algorithm="tauLeap", tau=1, trajectories=10, bootstraps=
 ```
 Here, we plot the mean of ten trajectories simulated by a tau-leaping algorithm, and its 99% confidence intervals, computed from 1000 bootstrap replicates.
 ![Average of multiple realisations of the birth-death process defined above.](/images/birthdeath_samples.png)
+
+
+
+
+
+## The birth-death process example
+
+Consider a birth-death process in which birth requires one male and one female, and the birth of a male is as likely as the birth of a female. If we denote the number of males in the population as M, and the number of females as F, when we can write the system,
+
+<div id="birthdeathF" class="katex"></div><br /><p />
+<div id="birthdeathM" class="katex"></div><br /><p />
+
+where &mu; is the per-capita birth rate and &delta; is the per-capita death rate. If we let N be the total population, then
+
+<div id="bdN" class="katex"></div><br /><p />
+
+and
+
+<div id="dNdt" class="katex"></div><br /><p />
+
+
+For a steady population, that neither grows exponentially or dies out, then
+
+<div id="dNdt0" class="katex"></div><br /><p />
+
+and so
+
+<div id="muondelta" class="katex"></div><br /><p />
+
+In the case where there are approximately as many females as there are males, then
+
+<div id="implies" class="katex"></div><br /><p />
+
+For a population made up of an equal number of females and males, therefore, the per-capita birth rate must be four times that of the per-capita death rate.
+
+
+<script>
+var birthdeathM = "\\displaystyle \\frac{\\text{d}{F}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, M,";
+var birthdeathM = "\\displaystyle \\frac{\\text{d}{M}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, F,";
+var bdN = "\\displaystyle N = M + F,";
+var dNdt = "\\displaystyle \\frac{\\text{d}{N}}{dt} = \\mu \\, \\frac{M\\,F}{(M+F)} - \\delta\\, N.";
+var dNdt0 = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0,";
+var muondelta = "\\displaystyle \\frac{\\mu}{\\delta} = \\frac{N^2}{M\\,F}.";
+var implies = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0 \\implies \\frac{\\mu}{\\delta} = 4.";
+
+katex.render(SIR_S, document.getElementById('SIR_S'));
+katex.render(SIR_I, document.getElementById('SIR_I'));
+katex.render(SIR_R, document.getElementById('SIR_R'));
+</script>

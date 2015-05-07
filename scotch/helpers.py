@@ -59,7 +59,7 @@ def parse(S, states_map=[], params=[]) :
                 
             # Else, if it's a state variable, replace it with vector notation
 			elif buff in states_map :
-				out.append("int(X[%d])" % states_map[buff])
+				out.append("float(X[%d])" % states_map[buff])
                 
             # Else, it's a constant, cast as a float
 			elif buff :
@@ -118,12 +118,13 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackActors = False) :
+	
 	# Initialize dictionary of arrays by state
 	statesDict = {}
 	for s in model.states :
 		statesDict[s] = []
 
-	
+
 
 	# Input initial conditions
 	lastID = 0

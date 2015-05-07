@@ -198,19 +198,27 @@ In the case where there are approximately as many females as there are males, th
 
 <div id="implies" class="katex"></div><br /><p />
 
-For a population made up of an equal number of females and males, therefore, the per-capita birth rate must be four times that of the per-capita death rate.
+For a population made up of an equal number of females and males, therefore, the per-capita birth rate must be four times that of the per-capita death rate. Our example above started with twice as many females as males, which gives a birth to death ratio of 9:2 required for population stability. With the weighted average of our death rates &delta;, that implies a required birth rate of &mu; = 0.593. We used &mu; = 0.5, and so expect the population to decay.
+
+
+
+
 
 
 <script>
 var birthdeathM = "\\displaystyle \\frac{\\text{d}{F}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, M,";
-var birthdeathM = "\\displaystyle \\frac{\\text{d}{M}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, F,";
+var birthdeathF = "\\displaystyle \\frac{\\text{d}{M}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, F,";
 var bdN = "\\displaystyle N = M + F,";
 var dNdt = "\\displaystyle \\frac{\\text{d}{N}}{dt} = \\mu \\, \\frac{M\\,F}{(M+F)} - \\delta\\, N.";
 var dNdt0 = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0,";
 var muondelta = "\\displaystyle \\frac{\\mu}{\\delta} = \\frac{N^2}{M\\,F}.";
 var implies = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0 \\implies \\frac{\\mu}{\\delta} = 4.";
 
-katex.render(SIR_S, document.getElementById('SIR_S'));
-katex.render(SIR_I, document.getElementById('SIR_I'));
-katex.render(SIR_R, document.getElementById('SIR_R'));
+katex.render(birthdeathF, document.getElementById('birthdeathF'));
+katex.render(birthdeathM, document.getElementById('birthdeathM'));
+katex.render(bdN, document.getElementById('bdN'));
+katex.render(dNdt, document.getElementById('dNdt'));
+katex.render(dNdt0, document.getElementById('dNdt0'));
+katex.render(muondelta, document.getElementById('muondelta'));
+katex.render(implies, document.getElementById('implies'));
 </script>

@@ -6,7 +6,7 @@ import helpers
 
 
 # Gillespie algorithm
-def gillespie(model, tmax, track=False, silent=False, propagate=False) :
+def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs) :
 
 	# Initialise
 	t = [0]
@@ -107,14 +107,14 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False) :
 
 
 
-def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False) :
+def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, **kwargs) :
 
 	# Initialise
 	if not propagate :
 		model.build(silent=True) # initialise model
 
 	t = np.arange(0,tmax,tau)
-	trace = np.zeros((int(tmax/tau),len(model.X)))
+	trace = np.zeros((np.ceil(float(tmax)/tau),len(model.X)))
 	trace[0,:] = model.X[:]
 	rates = np.zeros(model.N_events)
 	tracking_idx = -1;

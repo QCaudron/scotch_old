@@ -284,6 +284,16 @@ class model(object) :
 
 
 
+
+	def simulate(self, T, **kwargs) :
+
+		# Determine algorithm
+		algorithm = eval("simulate." + kwargs.get("algorithm", self.optional["default_algorithm"]))
+
+		# Run the algorithm
+		return algorithm(self, T, **kwargs)
+		
+	"""
 	def simulate(self, T, silent=False, track=False, propagate=False, **kwargs) :
 
 		# Additional arguments for different algorithms
@@ -319,7 +329,7 @@ class model(object) :
 			return algorithm(self, T, **parameters)
 		else :
 			return algorithm(self, T)
-
+	"""
 
 
 
@@ -386,20 +396,28 @@ class model(object) :
 			# Draw a number of realisations with replacement
 			idx = np.random.randint(0, trajectories, (bootstraps, trajectories))
 
+
+			if not silent :
+				print "Bootstrapping."
+				helpers.progBarStart()
+
+
 			# For each dimension in the state space
-			for dim in self.states :
+			for dimidx, dim in enumerate(self.states) :
 				means[dim] = []
 
-				if not silent :
-					print "Bootstrapping {}.".format(dim)
 				
 				# and for each bootstrap iteration
-				for i in idx :
+				for iidx, i in enumerate(idx) :
 					# Calculate the means of this iteration
 					means[dim].append(np.nanmean(int_trace[dim][i], axis=0))
 
+					if not silent :
+						helpers.progBarUpdate([dimidx*(iidx-1), dimidx*iidx], len(self.states)*bootstraps)
+
 				# After doing all iterations, sort the means
 				means[dim] = np.sort(np.array(means[dim]), axis=0)
+
 
 			# Extract intervals
 			ci_low = { dim : means[dim][int((1-alpha)*bootstraps/2.)] for dim in self.states }
@@ -440,10 +458,12 @@ class model(object) :
 									  silent=silent, 
 									  **kwargs)
 
-		for s, state in enumerate(self.states) :
+		statestoplot = kwargs["plot"] if "plot" in kwargs else self.states
+
+		for s, state in enumerate(statestoplot) :
 			plt.plot(t, mean[state], lw=3)
 			plt.fill_between(t, dn[state], up[state], alpha=0.4, color=C[s % 6])
-		plt.legend(self.states)
+		plt.legend(statestoplot)
 		plt.xlabel("Time")
 		plt.xlim(0, T)
 		plt.tight_layout()
@@ -453,4 +473,8 @@ class model(object) :
 
 
 
-
+# PROBLEMS :
+# 
+# Tauleap state space still goes negative occasionally; seems dependent on tau / tmax
+# Round up still required in defining trace[] array in tauleap ? Added; check it works
+# Progbar for bootstrapping in sample() and plotsamples() is epic fail

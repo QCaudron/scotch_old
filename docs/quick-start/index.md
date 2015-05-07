@@ -17,9 +17,9 @@ In this quick-start, we'll implement the basic [Susceptible-Infected-Recovered](
 In the case of small populations, the continuous property of the state space can be a poor assumption, and we may prefer to simulate each individual in the population as separate entities. We'll phrase this model in the language of discrete-state stochastic processes, particularly that of continuous-time Markov chains. 
 
 
-### Using the Wizard
+### The model file
 
-_scotch_ models are defined in JSON format. For the SIR model above, it would look like this :
+_scotch_ models are defined in JSON format. For the SIR model above, with time in days, it would look like this :
 
 ```
 {
@@ -64,7 +64,9 @@ You can download this file [here](files/sir.json).
 
 
 
-### Importing the model
+### Running the model
+
+Let's boot up _scotch_ and begin simulating the system.
 
 ```python
 import scotch
@@ -87,36 +89,27 @@ r0 = 18
 gamma = 1/14
 ```
 
-
-
-
-
-
-### Simulating the model
-
-In order to get sample trajectories of your stochastic model, simply call `model.simulate(tmax)`. For example :
-```python
-t, trace = model.simulate(30)
-```
-will simulate the model and return the time values in `t`, and the state space in `trace`. You can then `plt.plot(t, trace)`. See the [documentation on scotch.simulate](documentation/simulate/) for different simulation algorithms and options.
-
-If you're just looking to inspect your system visually, you can call `model.plot`. This takes exactly the same arguments as whichever simulation algorithm you're using.
+Let's see what happens over the course of thirty days.
 
 ```python
 model.plot(30)
 ```
+![Stochastic realisation of the SIR model.](/images/sir.png)
 
-PHOTO GOES HERE
+This is one realisation of the system. Perhaps we instead want to see average dynamics. Let's get the mean of one hundred trajectories and bootstrap some confidence intervals. We'll use the tau-leaping algorithm for speed.
 
-
-
-
-
-### Sampling trace expectations and credible intervals
-
-Watch this space.
+```python
+model.plotsamples(30, algorithm="tauLeap", tau=0.25, trajectories=100, bootstrap=500)
+```
+![Mean dynamics of the stochastic SIR model.](/images/sir_mean.png)
 
 
+Both `.plot` and `.plotsamples` call `.simulate` under the hood. If you want _scotch_ to return the traces of simulations to you, simply call
+```python
+t, trace = model.simulate(30)
+```
+
+See the documentation for the complete API reference.
 
 
 

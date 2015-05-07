@@ -78,6 +78,10 @@ class model(object) :
 			# Read in optional data
 			missing = list(set(model).difference(helpers.required)) # additional fields
 			self.optional = { i : model[i] for i in missing }
+
+			# It's optional, but if it isn't defined, set the default algo
+			if "default_algorithm" not in self.optional :
+				self.optional["default_algorithm"] = "gillespie"
 			
 			# Some model stuff
 			self.build()
@@ -190,63 +194,6 @@ class model(object) :
 		self.rates = []
 		for e in self.events :
 			self.rates.append(eval("lambda X, time : %s" % helpers.parse(e[0], self.states_map, self.parameters)))
-
-		# # Rewrite states as not unicode
-		# for idx,s in enumerate(self.states) :
-		# 	self.states[idx] = s.encode("utf-8")
-
-		# # Rewrite reactions as not unicode
-		# for idx1, r in enumerate(self.events) :
-		# 	self.events[idx1][0]=r[0].encode("utf-8")
-		# 	for item in r[1].keys() :
-		# 		self.events[1][idx2] = r[idx2].encode("utf-8")
-
-
-		# print "Would you like to track any reactions? (y/n)"
-		# reaction_tracker_ind = raw_input()
-
-		# if reaction_tracker_ind == "y" :
-		# 	print self
-		# 	print "Which reactions would you like to track? (enter Reaction Numbers separated by commas)"
-		# 	num_tracked_trans = raw_input().split(",")
-		# 	print num_tracked_trans
-		# 	self.tracked_trans = [self.reactions[int(x)] for x in num_tracked_trans] 
-		# 	#self.tracked_trans = self.reactions[ [int(x) for x in num_tracked_trans] ]
-		# 	print self.tracked_trans
-		# 	#generate tracked states from transitions
-		# 	self.tracked_states = []
-		# 	for t in self.tracked_trans :
-		# 		for t2 in t :
-		# 			if (t2 in self.states and t2 not in self.tracked_states):
-		# 				self.tracked_states.append(t2)
-
-
-		# 	#	for y in x :
-		# 	# 		if y not in self.states :
-		# 	# 		 	print("Error:", y ," is not a valid state")
-		# 	# 		 	self.tracked_trans = None
-		# 	# 		 	self.tracked_states = None
-		# 	# 		else :
-		# 	# 		 	if y not in self.tracked_states :
-		# 	# 		 		self.tracked_states.append(y)
-
-
-
-
-
-		# 	#build in check to make sure states are real states
-		# 	#for t in self.tracked_trans :
-
-
-		# else :
-		# 	print "Would you like to track any states? (y/n)"
-		# 	state_tracker_ind = raw_input()
-
-		# 	if state_tracker_ind == "y":
-		# 		print "Which states would you like to track? (Enter states separated by commas)"
-		# 		print self.states
-		# 		self.tracked_states = raw_input().replace(" ", "").split(",")
-
 		
 		if not silent :
 			print self
@@ -324,8 +271,10 @@ class model(object) :
 			pass
 
 		t, trace = self.simulate(T, **kwargs)
-		plt.plot(t, trace)
+		plt.plot(t, trace, lw=3)
 		plt.legend(self.states)
+		plt.xlabel("Time")
+		plt.tight_layout()
 		plt.show()
 
 
@@ -466,6 +415,8 @@ class model(object) :
 			plt.plot(t, mean[state], lw=3)
 			plt.fill_between(t, dn[state], up[state], alpha=0.4, color=C[s % 6])
 		plt.legend(self.states)
+		plt.xlabel("Time")
+		plt.tight_layout()
 		plt.show()
 
 

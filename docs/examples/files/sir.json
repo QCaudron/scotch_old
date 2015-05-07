@@ -1,10 +1,27 @@
 {
+    "States" : [
+        "S",
+        "I",
+        "R"
+    ],
+
+    "InitialConditions" : {
+        "S" : 99,
+        "I" : 1,
+        "R" : 0
+    },
+
+    "Parameters" : {
+        "r0" : "18",
+        "gamma" : "1/14"
+    },
+
     "Events" : [
         [
             "r0 * gamma * S * I / (S+I+R)",
             {
-                "I" : 1,
-                "S" : -1
+                "S" : -1,
+                "I" : 1
             }
         ],
         [
@@ -14,21 +31,5 @@
                 "R" : 1
             }
         ]
-    ],
-    "Filename" : "/Users/qcaudron/repositories/scotch/docs/examples/sir.json",
-    "InitialConditions" : {
-        "I" : 1,
-        "R" : 0,
-        "S" : 99
-    },
-    "Parameters" : {
-        "gamma" : "1/14",
-        "r0" : "18"
-    },
-    "States" : [
-        "S",
-        "I",
-        "R"
-    ],
-    "default_algorithm" : "gillespie"
+    ]
 }

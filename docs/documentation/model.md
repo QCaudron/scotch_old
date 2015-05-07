@@ -2,19 +2,18 @@
 
 [TOC]
 
-## Model API
 
 Our interface for simulating, sampling from, or plotting Markov processes is accessed through _scotch_ model objects. **The heart of _scotch_ lies in its model objects.**
 
 
 
-### Example system
+## Example system
 
 We'll be implementing a two-sex birth-death process. A complete derivation of the system is provided at the end of this page; briefly, however, the context is a "human" population composed of a number of females `F` and males `M`. We assume that males and females must meet to reproduce, which they do at a rate `birth`. We assume that the birth of a male is as likely as the bith of a female. Additionally, males and females die at different rates, `death_M` and `death_F`, respectively. We'll use years as our unit of time.
 
 
 
-### Creating a model object using the wizard
+## Creating a model object using the wizard
 
 Creating a blank model is as simple as :
 ```python
@@ -31,7 +30,7 @@ More on the wizard below.
 
 
 
-### Creating a model from file
+## Creating a model from file
 
 Alternatively, you can pass the filename of a JSON file containing a _scotch_ model :
 ```python
@@ -43,7 +42,7 @@ model = scotch.model("mymodel.json")
 
 
 
-### Using the wizard
+## Using the wizard
 After initiating a _scotch_ model using `model = scotch.model()`, calling `model.wizard()` will invoke the wizard to walk you through model creation. You'll be asked for a number of things :
 
 - A list of state variables, and their initial conditions
@@ -91,7 +90,7 @@ The wizard is now complete, and `model` contains a fully-determined _scotch_ mod
 
 
 
-### Saving models
+## Saving models
 Models can be saved to file using
 ```python
 model.save("mymodel.json")
@@ -101,7 +100,7 @@ This writes a [JSON](http://en.wikipedia.org/wiki/JSON) file that's then easily 
 
 
 
-### Simulating model realisations
+## Simulating model realisations
 You can simulate a single realisation of a model by calling
 ```python
 t, trace = model.simulate(tmax)
@@ -109,6 +108,7 @@ t, trace = model.simulate(tmax)
 where `tmax` is the maximum simulation time. This returns `t`, an array of times, and `trace`, a dictionary mapping the state variables to their traces. For example, you could plot the number of males over time using `plt.plot(t, trace["M"])`.
 
 The `model.simulate()` method takes optional keyword arguments. You can specify an `algorithm` :
+
 - `algorithm="gillespie"`
 - `algorithm="tauLeap"`
 
@@ -125,7 +125,7 @@ Every time you call `model.simulate()`, the model is reset to its initial condit
 
 
 
-### Quick-plotting single realisations
+## Quick-plotting single realisations
 ```python
 model.plot(tmax)
 ```
@@ -140,13 +140,14 @@ model.plot(100, algorithm="tauLeap", tau=.1, silent=True)
 
 
 
-### Sampling trajectories from the model
+## Sampling trajectories from the model
 ```python
 t, meanTrace, lowerCI, upperCI = model.sample(tmax)
 ```
 Here, `t` is an array of times, `meanTrace` is the mean of all trajectories simulated, and `lowerCI` and `upperCI` and the lower and upper confidence intervals of the mean, respectively. This repeatedly simulates the system, computes the mean trajectory, and bootstraps confidence intervals for the mean. In order to compute these statistics, sample times must match; whilst this isn't a problem with tau-leaping, the random nature of event times in the Gillespie algorithm means that trajectories must be interpolated over. For consistency, we interpolate regardless of the algorithm.
 
 All keyword arguments to `model.simulate()` can be passed here to `model.sample`. In addition, you can specify :
+
 - `trajectories` : the number of trajectories to simulate; default is 100
 - `bootstraps` : the number of bootstrap replicates used to estimate confidence intervals around the mean; default is 500
 - `tvals` : the number of time values to return during interpolation; default is 1000
@@ -155,9 +156,10 @@ All keyword arguments to `model.simulate()` can be passed here to `model.sample`
 
 
 
-### Plotting mean dynamics of the system
+## Plotting mean dynamics of the system
 Combining `model.sample()` and `model.plot()`, you can sample repeatedly from your system and immediately plot its mean trajectories.
 ```python
 model.plotsamples(1000, algorithm="tauLeap", tau=1, trajectories=10, bootstraps=1000, alpha=0.99)
 ```
 Here, we plot the mean of ten trajectories simulated by a tau-leaping algorithm, and its 99% confidence intervals, computed from 1000 bootstrap replicates.
+![Average of multiple realisations of the birth-death process defined above.](/images/birthdeath_samples.png)

@@ -193,7 +193,23 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 							increment_actors_dict(model, temp_actorPairsList ,idx2, lastID,temp_stateDict)
 							
 				    	temp_stateDict[state_idx_add].append(lastID)
-				elif not all(i == 0 for i in item2):
+				elif all(i <=0 for i in item2) and not all(i == 0 for i in item2):
+					#if not, generate new ids to add to state where things get added
+					state_idx_remove = np.where(item2 < 0)[0]
+					num_items_to_move = item2[state_idx_remove]
+					ids_to_move = []
+					for i in np.random.choice(temp_stateDict[state_idx_remove],np.abs(num_items_to_move),replace=False) :
+					    ids_to_move.append(i)
+					    if trackActors and eventActors:
+							
+						#add pair of actors to temp dict
+						#get random actor from actor class by 
+						#choosing random ID from corresponding temp_stateDict
+							increment_actors_dict(model, temp_actorPairsList ,idx2, i, temp_stateDict)
+							# print temp_actorPairsList
+
+					    temp_stateDict[state_idx_remove].remove(i)
+				else :
 					state_idx_remove = np.where(item2 < 0)[0]
 					num_items_to_move = item2[state_idx_remove]
 					ids_to_move = []

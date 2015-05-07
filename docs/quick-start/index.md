@@ -121,12 +121,12 @@ Watch this space.
 
 
 
-    <script>
-    var SIR_S = "\\displaystyle \\frac{\\text{d}{S}}{dt} = -\\frac{\\beta \\, S \\, I}{N}";
-    var SIR_I = "\\displaystyle \\frac{\\text{d}{I}}{dt} = \\frac{\\beta \\, S \\, I}{N} - \\gamma \\, I";
-    var SIR_R = "\\displaystyle \\frac{\\text{d}{R}}{dt} = \\gamma \\, I";
+<script>
+var SIR_S = "\\displaystyle \\frac{\\text{d}{S}}{dt} = -\\frac{\\beta \\, S \\, I}{N}";
+var SIR_I = "\\displaystyle \\frac{\\text{d}{I}}{dt} = \\frac{\\beta \\, S \\, I}{N} - \\gamma \\, I";
+var SIR_R = "\\displaystyle \\frac{\\text{d}{R}}{dt} = \\gamma \\, I";
 
-    katex.render(SIR_S, document.getElementById('SIR_S'));
-    katex.render(SIR_I, document.getElementById('SIR_I'));
-    katex.render(SIR_R, document.getElementById('SIR_R'));
-    </script>
+katex.render(SIR_S, document.getElementById('SIR_S'));
+katex.render(SIR_I, document.getElementById('SIR_I'));
+katex.render(SIR_R, document.getElementById('SIR_R'));
+</script>

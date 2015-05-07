@@ -6,13 +6,15 @@ import helpers
 
 
 # Gillespie algorithm
-def gillespie(model, tmax, track=False, silent=False) :
+def gillespie(model, tmax, track=False, silent=False, propagate=False) :
 
 	# Initialise
 	t = [0]
-	model.build(silent=True) # initialise model
-	trace = model.X[:]
 
+	if not propagate :
+		model.build(silent=True) # initialise model
+
+	trace = model.X[:]
 
 
 	# Generate this many random uniforms at once, for speed
@@ -86,7 +88,8 @@ def gillespie(model, tmax, track=False, silent=False) :
 
 
 	# Reset state space
-	model.X = np.array([model.initconds[x] for x in model.states], dtype=int)
+	if not propagate :
+		model.X = np.array([model.initconds[x] for x in model.states], dtype=int)
 
 	if track :
 		return (t, trace, tracked_trans_array)
@@ -104,10 +107,12 @@ def gillespie(model, tmax, track=False, silent=False) :
 
 
 
-def tauLeap(model, tmax, tau=1, track=False, silent=False) :
+def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False) :
 
 	# Initialise
-	model.build(silent=True) # initialise model
+	if not propagate :
+		model.build(silent=True) # initialise model
+
 	t = np.arange(0,tmax,tau)
 	trace = np.zeros((int(tmax/tau),len(model.X)))
 	trace[0,:] = model.X[:]
@@ -182,7 +187,9 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False) :
 
 
 	# Reset state space
-	model.X = np.array([model.initconds[x] for x in model.states], dtype=int)
+	if not propagate :
+		model.X = np.array([model.initconds[x] for x in model.states], dtype=int)
+	
 	if track :
 		return (t, trace, tracked_trans_array)
 	else :

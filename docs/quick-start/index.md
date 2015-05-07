@@ -5,9 +5,6 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.2.0/katex.min.js"></script>
 
 
-[TOC]
-
-
 In this quick-start, we'll implement the basic [Susceptible-Infected-Recovered](http://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology) epidemiological model. This compartmental model is typically described by a system of deterministic, ordinary differential equations :
 
 <div id="SIR_S" class="katex"></div><br /><p />
@@ -19,7 +16,7 @@ In the case of small populations, the continuous property of the state space can
 
 ### The model file
 
-_scotch_ models are defined in JSON format. For the SIR model above, with time in days, it would look like this :
+_scotch_ models are defined in [JSON](http://en.wikipedia.org/wiki/JSON) format. For the SIR model above, with time in days, it would look like this :
 
 ```
 {

@@ -1,0 +1,43 @@
+{
+    "Events" : [
+        [
+            "0.5 * birth * M * F / (M+F)",
+            {
+                "F" : 1
+            }
+        ],
+        [
+            "0.5 * birth * M * F / (M+F)",
+            {
+                "M" : 1
+            }
+        ],
+        [
+            "death_F * F",
+            {
+                "F" : -1
+            }
+        ],
+        [
+            "death_M * M",
+            {
+                "M" : -1
+            }
+        ]
+    ],
+    "Filename" : "/Users/qcaudron/repositories/scotch/docs/examples/files/birthdeath_wizard.json",
+    "InitialConditions" : {
+        "F" : 2000,
+        "M" : 1000
+    },
+    "Parameters" : {
+        "birth" : "0.05",
+        "death_F" : "1/70",
+        "death_M" : "1/65"
+    },
+    "States" : [
+        "F",
+        "M"
+    ],
+    "default_algorithm" : "gillespie"
+}

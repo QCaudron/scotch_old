@@ -274,6 +274,7 @@ class model(object) :
 		plt.plot(t, trace, lw=3)
 		plt.legend(self.states)
 		plt.xlabel("Time")
+		plt.xlim(0, t[-1])
 		plt.tight_layout()
 		plt.show()
 
@@ -283,7 +284,7 @@ class model(object) :
 
 
 
-	def simulate(self, T, silent=False, **kwargs) :
+	def simulate(self, T, silent=False, propagate=False, **kwargs) :
 
 		# Additional arguments for different algorithms
 		algoparams = {
@@ -307,8 +308,9 @@ class model(object) :
 					parameters[p] = kwargs[p]
 
 
-		# Silent or no ?
+		# Additional simulation parameters
 		parameters["silent"] = silent
+		parameters["propagate"] = propagate
 
 
 		# Run the algorithm
@@ -327,11 +329,11 @@ class model(object) :
 
 
 
-	def sample(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, **kwargs) :
+	def sample(self, T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95, **kwargs) :
 
 		from scipy.interpolate import interp1d
 
-		# Sample repeatedly from the model and potentially return summary statistics only
+		# Sample repeatedly from the model and return summary statistics only
 		all_t = []
 		all_trace = []
 
@@ -384,8 +386,8 @@ class model(object) :
 			means[dim] = np.sort(np.array(means[dim]), axis=0)
 
 		# Extract intervals
-		ci_low = { dim : means[dim][int(alpha*bootstraps/2.)] for dim in self.states }
-		ci_high = { dim : means[dim][int(1.-alpha*bootstraps/2.)] for dim in self.states }
+		ci_low = { dim : means[dim][int((1-alpha)*bootstraps/2.)] for dim in self.states }
+		ci_high = { dim : means[dim][int(1.-(1-alpha)*bootstraps/2.)] for dim in self.states }
 
 		return int_t, m, ci_low, ci_high
 

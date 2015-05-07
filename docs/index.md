@@ -10,7 +10,7 @@ _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch*
 
 - **Quick-Start** : dive straight into describing stochastic processes and simulating them with _scotch_.
 - **Model Specifications** : the full specs for _scotch_ model files.
-- **Documentation** : docs for model building, simulating, sampling, and plotting _scotch_ systems.
+- **Scotch API and Docs** : docs for model building, simulating, sampling, and plotting _scotch_ systems.
 - **Examples** : a series of example _scotch_ models that work out of the box.
 
 
@@ -21,17 +21,18 @@ _scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch*
 
 #### Currently implemented :
 
-- interactive "wizard" for full model specification
-- Gillespie's algorithm
+- interactive, text-based "wizard" for full model specification
+- Gillespie's (SSA) algorithm
 - tau-leaping algorithm
-- a quick-plot method
+- a quick-plot method for single realisations
+- repeat trajectory sampling and bootstrapping confidence intervals
+- complete event tracking
 
 
 #### For the future :
 
 - Gibson-Bruck algorithm
 - adaptive timestepping in tau-leaping
-- generating trace distributions with credible intervals
 - parameter inference
 
 

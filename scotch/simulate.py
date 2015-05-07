@@ -6,7 +6,7 @@ import helpers
 
 
 # Gillespie algorithm
-def gillespie(model, tmax, track=False) :
+def gillespie(model, tmax, track=False, silent=False) :
 
 	# Initialise
 	t = [0]
@@ -29,7 +29,8 @@ def gillespie(model, tmax, track=False) :
 	rcount = 0
 
 	# Start the progress bar
-	helpers.progBarStart()
+	if not silent :
+		helpers.progBarStart()
 
 
 
@@ -43,7 +44,8 @@ def gillespie(model, tmax, track=False) :
 		# Determine which event occurred after ensuring that there's 
 		# a valid transition, and update the state space
 		if np.sum(rates) <= 0 :
-			print "Stopping early - no valid transitions !"
+			if not silent :
+				print "Stopping early - no valid transitions !"
 			break
 
 
@@ -79,7 +81,8 @@ def gillespie(model, tmax, track=False) :
 
 
 		# Update progress bar
-		helpers.progBarUpdate(t[-2:], tmax)
+		if not silent :
+			helpers.progBarUpdate(t[-2:], tmax)
 
 
 	# Reset state space
@@ -101,7 +104,7 @@ def gillespie(model, tmax, track=False) :
 
 
 
-def tauLeap(model, tmax, tau=1, track=False) :
+def tauLeap(model, tmax, tau=1, track=False, silent=False) :
 
 	# Initialise
 	model.build(silent=True) # initialise model
@@ -112,7 +115,8 @@ def tauLeap(model, tmax, tau=1, track=False) :
 	tracking_idx = -1;
 
 	# Start the progress bar
-	helpers.progBarStart()
+	if not silent :
+		helpers.progBarStart()
 
 	if track:
 		tracked_trans_array = np.zeros((model.N_events,int(tmax/tau)))
@@ -133,7 +137,8 @@ def tauLeap(model, tmax, tau=1, track=False) :
 		# Determine which events occurred after ensuring that there's 
 		# a valid transition, and update the state space
 		if np.sum(rates) <= 0 :
-			print "Stopping early - no valid transitions !"
+			if not silent :
+				print "Stopping early - no valid transitions !"
 			trace = np.delete(trace,range(idx+1,int(tmax/tau)+1),0)
 			t = np.delete(t,range(idx+1,int(tmax/tau)+1),0)
 			if track:
@@ -141,7 +146,7 @@ def tauLeap(model, tmax, tau=1, track=False) :
 			break
 
 		# Correct so things don't go negative :		
-		maxEvents = np.array([(model.X[i] if len(i) == 1 else np.inf) for i in cappedEvents])[:, 0]
+		maxEvents = np.array([(model.X[i] if len(i) == 1 else np.inf) for i in cappedEvents]).flatten()
 
 		# Determine the number of times each transition happens in tau time
 		estEvents = np.array([np.random.poisson(rate * tau) for rate in rates], dtype=int)
@@ -172,7 +177,8 @@ def tauLeap(model, tmax, tau=1, track=False) :
 
 
 		# Update progress bar
-		helpers.progBarUpdate(t[idx:idx+1], len(t))
+		if not silent :
+			helpers.progBarUpdate(t[idx:idx+1], len(t))
 
 
 	# Reset state space

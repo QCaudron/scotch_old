@@ -334,7 +334,7 @@ class model(object) :
 
 
 
-	def simulate(self, T, **kwargs) :
+	def simulate(self, T, silent=False, **kwargs) :
 
 		# Additional arguments for different algorithms
 		algoparams = {
@@ -358,6 +358,10 @@ class model(object) :
 					parameters[p] = kwargs[p]
 
 
+		# Silent or no ?
+		parameters["silent"] = silent
+
+
 		# Run the algorithm
 		if len(parameters) :
 			return algorithm(self, T, **parameters)
@@ -374,7 +378,7 @@ class model(object) :
 
 
 
-	def sample(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, sumstats=True, **kwargs) :
+	def sample(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, **kwargs) :
 
 		from scipy.interpolate import interp1d
 
@@ -385,7 +389,7 @@ class model(object) :
 		for traj in range(trajectories) :
 			
 			# Simulate the model
-			t, trace = self.simulate(T, **kwargs)
+			t, trace = self.simulate(T, silent=True, **kwargs)
 
 			# Append the time and traces to our arrays
 			all_t.append(t)
@@ -437,6 +441,32 @@ class model(object) :
 		return int_t, m, ci_low, ci_high
 
 
+
+
+
+
+
+
+
+
+	def plotsamples(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, **kwargs) :
+
+		import matplotlib as mpl
+		import matplotlib.pyplot as plt
+		C = mpl.rcParams["axes.color_cycle"]
+
+		try :
+			import seaborn as sns
+			C = sns.color_palette("deep", 6)
+		except ImportError :
+			pass
+
+		t, mean, dn, up = self.sample(T, trajectories, bootstraps, tvals, alpha, **kwargs)
+		for s, state in enumerate(self.states) :
+			plt.plot(t, mean[state], lw=3)
+			plt.fill_between(t, dn[state], up[state], alpha=0.4, color=C[s % 6])
+		plt.legend(self.states)
+		plt.show()
 
 
 

@@ -1,4 +1,4 @@
-# Scotch API and Docs
+# Model API
 
 [TOC]
 
@@ -70,7 +70,6 @@ The wizard then asks for their values. Currently, parameters are fixed in value,
 birth : 0.05
 death_F : 1/70
 death_M : 1/65
-
 ```
 Here, females have a life expectancy of 70 years, and males life for 65 years on average. Births require one male and one female, and occur at a rate of 50 per thousand individuals.
 

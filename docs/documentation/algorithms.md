@@ -1,3 +1,0 @@
-# Documentation
-
-### Simulation algorithm descriptions

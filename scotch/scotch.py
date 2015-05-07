@@ -473,6 +473,20 @@ class model(object) :
 
 
 
+
+
+
+
+	def trackindividuals(self, t=None, tracked=None, sampleto=0, **kwargs) :
+
+		if sampleto :
+			t, trace, tracked = self.simulate(sampleto, track=True, **kwargs)
+
+		return helpers.trackIndividuals(self, tracked, t, **kwargs)
+
+
+
+
 # PROBLEMS :
 # 
 # Tauleap state space still goes negative occasionally; seems dependent on tau / tmax

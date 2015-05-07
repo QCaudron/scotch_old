@@ -117,7 +117,7 @@ def progBarUpdate(t, tmax, width=25) :
 
 
 
-def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackActors = False) :
+def trackIndividuals(model, tracking_array, t, keepIndividuals=False, trackActors=False, **kwargs) :
 	
 	# Initialize dictionary of arrays by state
 	statesDict = {}

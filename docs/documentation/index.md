@@ -1,3 +1,3 @@
 # Documentation
 
-[TOC]
+This page shouldn't appear anywhere !

@@ -13,7 +13,6 @@ pages:
 - ["model-specs/initconds.md", "Model Specifications", "Initial Conditions"]
 - ["model-specs/parameters.md", "Model Specifications", "Parameters"]
 - ["model-specs/optional.md", "Model Specifications", "Optional Entries"]
-- ["documentation/index.md", "Scotch API and Docs", "Summary"]
 - ["documentation/model.md", "Scotch API and Docs", "Model API"]
 - ["documentation/algorithms.md", "Scotch API and Docs", "Simulation Algorithms"]
 - ["documentation/tracking.md", "Scotch API and Docs", "Event Tracking"]

@@ -206,13 +206,13 @@ For a population made up of an equal number of females and males, therefore, the
 
 
 <script>
-var birthdeathM = "\\displaystyle \\frac{\\text{d}{F}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, M,";
-var birthdeathF = "\\displaystyle \\frac{\\text{d}{M}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, F,";
+var birthdeathF = "\\displaystyle \\frac{\\text{d}{F}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, F,";
+var birthdeathM = "\\displaystyle \\frac{\\text{d}{M}}{dt} = \\mu \\, \\frac{M\\,F}{2(M+F)} - \\delta\\, M,";
 var bdN = "\\displaystyle N = M + F,";
 var dNdt = "\\displaystyle \\frac{\\text{d}{N}}{dt} = \\mu \\, \\frac{M\\,F}{(M+F)} - \\delta\\, N.";
 var dNdt0 = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0,";
 var muondelta = "\\displaystyle \\frac{\\mu}{\\delta} = \\frac{N^2}{M\\,F}.";
-var implies = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0 \\implies \\frac{\\mu}{\\delta} = 4.";
+var implies = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0 \\Rightarrow \\frac{\\mu}{\\delta} = 4.";
 
 katex.render(birthdeathF, document.getElementById('birthdeathF'));
 katex.render(birthdeathM, document.getElementById('birthdeathM'));

@@ -40,7 +40,12 @@ def parse(S, states_map=[], params=[]) :
     
     # Operators
 	symbols = ["+", "-", "*", "/", "(", ")", "#"]
-	operations = ["sin", "cos", "exp", "log", "pi", "tan"]
+	operations = ["sin", "cos", "tan", "arcsin", "arccos", "arctan", # trigonometric
+				  "sinh", "cosh", "tanh", "arcsinh", "arccosh", "arctanh", # hyperbolic
+				  "ceil", "floor", "abs", # rounding 
+				  "exp", "log", "expm1", "log10", "log2", "log1p", # transcendental
+				  "sinc", "sqrt", "square", "sign", # other
+				  "pi"] # constants
 
 	S = S.replace(" ", "") + "#"
     

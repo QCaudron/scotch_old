@@ -140,7 +140,7 @@ class model(object) :
 		# If no filename is provided, grab the last one used,
 		# or provide one if we've never saved this model
 		if filename is None :
-			filename = self.optional["Filename"] if "Filename" in self.optional else "scotch_model.json"
+			filename = self.optional.get("Filename", "scotch_model.json")
 
 		# Save filename for next time
 		self.optional["Filename"] = filename
@@ -492,3 +492,4 @@ class model(object) :
 # Tauleap state space still goes negative occasionally; seems dependent on tau / tmax
 # Round up still required in defining trace[] array in tauleap ? Added; check it works
 # Progbar for bootstrapping in sample() and plotsamples() is epic fail
+# Require constraints on events : don't do X if Y == 0, for example

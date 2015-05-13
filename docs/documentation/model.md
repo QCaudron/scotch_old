@@ -212,7 +212,7 @@ var bdN = "\\displaystyle N = M + F,";
 var dNdt = "\\displaystyle \\frac{\\text{d}{N}}{dt} = \\mu \\, \\frac{M\\,F}{(M+F)} - \\delta\\, N.";
 var dNdt0 = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0,";
 var muondelta = "\\displaystyle \\frac{\\mu}{\\delta} = \\frac{N^2}{M\\,F}.";
-var implies = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0 \\Rightarrow \\frac{\\mu}{\\delta} = 4.";
+var implies = "\\displaystyle \\frac{\\text{d}{N}}{dt} = 0 \\quad \\Rightarrow \\quad \\frac{\\mu}{\\delta} = 4.";
 
 katex.render(birthdeathF, document.getElementById('birthdeathF'));
 katex.render(birthdeathM, document.getElementById('birthdeathM'));

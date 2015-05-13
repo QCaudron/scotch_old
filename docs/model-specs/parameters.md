@@ -6,7 +6,7 @@ parameter.
 ```python
 "Parameters" : {
     "alpha" : "1/10",
-    "beta" : "1 + sin(2 * pi * time)
+    "beta" : "1 + sin(2 * pi * time)"
 }
 ```
 
@@ -28,18 +28,18 @@ A number of reserved keywords also allow access to constants and to the explicit
 - `pi`
 - `time` ( allows time-dependent parameter rates to be used )
 
-As an example, `sin(2 * pi * sqrt(F) * time)` is a legal part of a parameter value, if you have declared F as a state variable; this allows parameters to vary sinusoidally in time. The `time` keyword 
-is replaced by the numerical value of time during simulation. Parameters can therefore be state-dependent and time-dependent; they cannot, however, be written in terms of other parameters.
+As an example, `sin(2 * pi * sqrt(F) * time)` is a legal part of a parameter value, if you have declared F as a state variable; this particular example allows parameters to vary sinusoidally in time. 
+The `time` keyword is replaced by the numerical value of time during simulation. Parameters can therefore be state-dependent and time-dependent; they cannot, however, be written in terms of other parameters.
 
 All numerical values are cast as floats, so expressions like `1/10` will be evaluated as 0.1.
 
 Allowed operators are :
 
-- `+`, addition
-- `-`, subtraction
-- `*`, multiplication
-- `/`, division
-- `**`, power
-- `(`, `)`, brackets
+- `+`
+- `-`
+- `*`
+- `/`
+- `**`
+- `(`, `)`
 
 Currently, custom functions that cannot be written with this syntax will not evaluate. 

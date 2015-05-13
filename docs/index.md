@@ -47,6 +47,7 @@ Please let us know about bugs as issues on [Github](http://github.com/QCaudron/s
 
 #### Required 
 
+- Python >= 2.7
 - Numpy
 - Scipy (for `model.sample()` and `model.plotsamples()`)
 - Matplotlib (for `model.plot()` and `model.plotsamples()`)

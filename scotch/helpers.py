@@ -21,6 +21,9 @@ class FileNotFound(Exception) :
 class InvalidModel(Exception) :
 	pass
 
+class SimulationError(Exception) :
+	pass
+
 
 
 

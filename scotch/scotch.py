@@ -2,6 +2,7 @@
 import json
 import os
 import numpy as np
+from scipy.interpolate import interp1d
 
 """
 try :
@@ -25,6 +26,89 @@ import simulate
 # Model class
 
 class model(object) :
+	"""
+	scotch model object
+
+	The model is scotch's basic object class, allowing
+	access to all of the features in scotch.
+
+	The following functions all have docstrings, call
+	?scotch.model.<function>
+	for more information on these methods.
+
+
+	model()
+	Model Creation
+	--------------
+
+	model = scotch.model()
+	model = scotch.model("scotch_model_file.json")
+
+	Create a model from scratch, or load a previous model.
+
+
+	wizard()
+	Creation using the Wizard
+	-------------------------
+
+	model.wizard()
+
+	Invoke the wizard to guide you through model creation.
+
+
+	save()
+	Save a model to file
+	--------------------
+
+	model.save()
+
+	Save a complete scotch model to JSON file for later use.
+
+
+	plot()
+	Plot one realisation of the stochastic model
+	--------------------------------------------
+
+	model.plot()
+
+	Draw a realisation of the stochastic process up to some time,
+	and plot the full state space.
+
+
+	simulate()
+	Return the trace of a realisation
+	---------------------------------
+
+	model.simulate()
+
+	Draw a realisation of the stochastic process up to some time,
+	and return the state space as a function of time.
+
+
+	sample()
+	Return summary statistics
+	-------------------------
+
+	model.sample()
+
+	Sample multiple realisations of the stochastic process, and
+	return the mean and confidence intervals of the realisations.
+
+
+	plotsamples()
+	Plot the mean and CIs of multiple realisations
+	----------------------------------------------
+
+	model.plotsamples()
+
+	Sample multiple realisations of the stochastic process, and
+	plot the means and confidence intervals of each state in the
+	system.
+
+	"""
+
+
+
 
 	# Descriptors
 	def __name__(self) :
@@ -47,9 +131,7 @@ class model(object) :
 			self.optional = { "default_algorithm" : "gillespie" } # Optional fields, like dataset, save name, ...
 			self.states_map = {} # Map between state symbols and vector notation
 			self.transition = None # Transition matrix
-			# self.tracked_states = None #State variables to be tracked during simulation
-			# self.tracked_trans = None #Transitions to be tracked during simulation
-
+			
 
 
 
@@ -109,6 +191,8 @@ class model(object) :
 
 
 
+
+
 	# Long representation of model objects
 	def __str__(self) :
 
@@ -133,9 +217,23 @@ class model(object) :
 
 
 
+
 	# Save model
 	def save(self, filename=None) :
-		"""Save the model to a JSON file."""
+		"""
+		scotch.model.save(filename=None)
+		--------------------------------
+
+		Save a complete scotch model to JSON file for later use.
+		
+		Filename can be a string defining a local or complete path,
+		including filename in which to save the model.
+
+		If Filename is None, the model is saved to the location 
+		specified in the model.optional dictionary. If this is empty, 
+		Filename is defined as "./scotch_model.json".
+
+		"""
 
 		# If no filename is provided, grab the last one used,
 		# or provide one if we've never saved this model
@@ -208,7 +306,18 @@ class model(object) :
 
 
 	def wizard(self) :
-		"""Interactively generate a model."""
+		"""
+		scotch.model.wizard()
+		--------------------------------
+
+		Invoke the wizard to guide you through model creation.
+
+		This is an interactive function that will ask you the names
+		of your system's states, their initial conditions, the 
+		parameters in the system and their values, and the expressions
+		that define the rate at which transitions occur between states.
+
+		"""
 
 		# Variables
 		print "Complete list of state variables, separated by commas :"
@@ -263,14 +372,54 @@ class model(object) :
 
 
 	def plot(self, T, **kwargs) :
+		"""
+		scotch.model.plot(T, **kwargs)
+		------------------------------
 
+		Plot one realisation of the stochastic model.
+
+		T is the time until which the system is simulated.
+
+		A number of optional arguments can be passed to this function.
+
+		algorithm="gillespie", algorithm="tauLeap"
+		Use the exact Gillespie Stochastic Simulation Algorithm, or
+		a tau-leaping approximation for speed. More algorithms to come.
+
+		If algorithm="tauLeap", you may want to specify
+		tau=delta_t, where delta_t is the timestep at which tau-leaping
+		should be done. 
+		By default, tau=1.
+
+		If no algorithm is passed, we use the default algorithm as
+		defined in the model. If none is set, it defaults to Gillespie.
+
+		silent=False, silent=True
+		If silent, don't use progress bars or return warnings.
+		By default, silent=False.
+
+		propagate=False, propagate=True
+		If propagate, don't rebuild the model to initial conditions
+		every time this is run; carry forward the last state space.
+		By default, propagate=False.
+
+		"""
+
+		# Try to plot things beautifully
 		import matplotlib.pyplot as plt
 		try :
 			import seaborn
 		except :
 			pass
 
+		# If the user specifies they want to track, we cancel that;
+		# this method returns nothing
+		kwargs.pop("track", None)
+
+		# Simulate
 		t, trace = self.simulate(T, **kwargs)
+
+		# Plot everything
 		plt.plot(t, trace, lw=3)
 		plt.legend(self.states)
 		plt.xlabel("Time")
@@ -286,6 +435,44 @@ class model(object) :
 
 
 	def simulate(self, T, **kwargs) :
+		"""
+		t, trace, [track] = scotch.model.simulate(T, **kwargs)
+		------------------------------------------------------
+
+		Return the trace of a realisation.
+
+		T is the time until which the system is simulated.
+
+		A number of optional arguments can be passed to this function.
+
+		algorithm="gillespie", algorithm="tauLeap"
+		Use the exact Gillespie Stochastic Simulation Algorithm, or
+		a tau-leaping approximation for speed. More algorithms to come.
+
+		If algorithm="tauLeap", you may want to specify
+		tau=delta_t, where delta_t is the timestep at which tau-leaping
+		should be done. 
+		By default, tau=1.
+
+		If no algorithm is passed, we use the default algorithm as
+		defined in the model. If none is set, it defaults to Gillespie.
+
+		silent=False, silent=True
+		If silent, don't use progress bars or return warnings.
+		By default, silent=False.
+
+		propagate=False, propagate=True
+		If propagate, don't rebuild the model to initial conditions
+		every time this is run; carry forward the last state space.
+		By default, propagate=False.
+
+		track=False, track=True, 
+		If track, we track all transitions as they occur and return
+		these as a third output variable.
+		By default, track=False. Tracking slows simulations considerably.
+
+		"""
+
 
 		# Determine algorithm
 		algorithm = eval("simulate." + kwargs.get("algorithm", self.optional["default_algorithm"]))
@@ -293,44 +480,6 @@ class model(object) :
 		# Run the algorithm
 		return algorithm(self, T, **kwargs)
 		
-	"""
-	def simulate(self, T, silent=False, track=False, propagate=False, **kwargs) :
-
-		# Additional arguments for different algorithms
-		algoparams = {
-			simulate.tauLeap : ["tau"]
-		}
-
-
-		# Parameters to pass
-		parameters = {}
-
-
-		# Determine algorithm
-		algorithm = eval("simulate." + kwargs.get("algorithm", self.optional["default_algorithm"]))
-
-		
-		# If not Gillespie, check that required parameters are present
-		for algo, params in algoparams.items() :
-			if algorithm == algo :
-				for p in params :
-					assert p in kwargs, "The parameter %s is required for the %s algorithm." % (p, algo)
-					parameters[p] = kwargs[p]
-
-
-		# Additional simulation parameters
-		parameters["silent"] = silent
-		parameters["propagate"] = propagate
-		parameters["track"] = track
-
-
-		# Run the algorithm
-		if len(parameters) :
-			return algorithm(self, T, **parameters)
-		else :
-			return algorithm(self, T)
-	"""
-
 
 
 
@@ -341,8 +490,58 @@ class model(object) :
 
 
 	def sample(self, T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95, silent=False, **kwargs) :
+		"""
+		t, means, CI_low, CI_high = scotch.model.sample(T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95)
+		------------------------------------------------------------------------------------------------------------
 
-		from scipy.interpolate import interp1d
+		Return summary statistics.
+
+		T is the time until which the system is simulated.
+
+		trajectories is the number of realisations to simulate.
+
+		bootstraps is the number of bootstrap samples to draw to 
+		compute the confidence intervals.
+		bootstraps=0 means CI_low and CI_high are not returned;
+		only the mean trajectory is calculated.
+
+		tvals is the number of time values to interpolate over to compute
+		means and confidence intervals, and the number of time values
+		returned to the user.
+
+		alpha is the level at which confidence intervals are computed.
+		The default, alpha=0.95, returns 95% confidence intervals around
+		the mean of the trajectories.
+
+		A number of optional arguments can be passed to this function.
+
+		algorithm="gillespie", algorithm="tauLeap"
+		Use the exact Gillespie Stochastic Simulation Algorithm, or
+		a tau-leaping approximation for speed. More algorithms to come.
+
+		If algorithm="tauLeap", you may want to specify
+		tau=delta_t, where delta_t is the timestep at which tau-leaping
+		should be done. 
+		By default, tau=1.
+
+		If no algorithm is passed, we use the default algorithm as
+		defined in the model. If none is set, it defaults to Gillespie.
+
+		silent=False, silent=True
+		If silent, don't use progress bars or return warnings.
+		By default, silent=False.
+
+		propagate=False, propagate=True
+		If propagate, don't rebuild the model to initial conditions
+		every time this is run; carry forward the last state space.
+		By default, propagate=False.
+
+		track=False, track=True, 
+		If track, we track all transitions as they occur and return
+		these as a third output variable.
+		By default, track=False. Tracking slows simulations considerably.
+
+		"""
 
 		# Sample repeatedly from the model and return summary statistics only
 		all_t = []
@@ -352,6 +551,7 @@ class model(object) :
 			print "Sampling trajectories."
 			helpers.progBarStart()
 
+		# For each trajectory index :
 		for traj in range(trajectories) :
 
 			if not silent :
@@ -423,11 +623,11 @@ class model(object) :
 			ci_low = { dim : means[dim][int((1-alpha)*bootstraps/2.)] for dim in self.states }
 			ci_high = { dim : means[dim][int(1.-(1-alpha)*bootstraps/2.)] for dim in self.states }
 
+			# Return everything
+			return int_t, m, ci_low, ci_high
+
 		else :
-			ci_low = None
-			ci_high = None
-
-		return int_t, m, ci_low, ci_high
+			return int_t, m
 
 
 
@@ -438,18 +638,76 @@ class model(object) :
 
 
 
-	def plotsamples(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.05, silent=False, **kwargs) :
 
-		import matplotlib as mpl
+	def plotsamples(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.95, silent=False, **kwargs) :
+		"""
+		scotch.model.plotsamples(T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95)
+		-----------------------------------------==------------------------------------------
+
+		Plot the mean and CIs of multiple realisations.
+
+		T is the time until which the system is simulated.
+
+		trajectories is the number of realisations to simulate.
+
+		bootstraps is the number of bootstrap samples to draw to 
+		compute the confidence intervals.
+		bootstraps=0 means CI_low and CI_high are not returned;
+		only the mean trajectory is calculated.
+
+		tvals is the number of time values to interpolate over to compute
+		means and confidence intervals, and the number of time values
+		returned to the user.
+
+		alpha is the level at which confidence intervals are computed.
+		The default, alpha=0.95, returns 95% confidence intervals around
+		the mean of the trajectories.
+
+		A number of optional arguments can be passed to this function.
+
+		plot=["State1", "State2"]
+		If not specified, plot all of the states in the model. Otherwise,
+		plot only those listed; the names must be those used in the model.
+
+		algorithm="gillespie", algorithm="tauLeap"
+		Use the exact Gillespie Stochastic Simulation Algorithm, or
+		a tau-leaping approximation for speed. More algorithms to come.
+
+		If algorithm="tauLeap", you may want to specify
+		tau=delta_t, where delta_t is the timestep at which tau-leaping
+		should be done. 
+		By default, tau=1.
+
+		If no algorithm is passed, we use the default algorithm as
+		defined in the model. If none is set, it defaults to Gillespie.
+
+		silent=False, silent=True
+		If silent, don't use progress bars or return warnings.
+		By default, silent=False.
+
+		propagate=False, propagate=True
+		If propagate, don't rebuild the model to initial conditions
+		every time this is run; carry forward the last state space.
+		By default, propagate=False.
+
+		track=False, track=True, 
+		If track, we track all transitions as they occur and return
+		these as a third output variable.
+		By default, track=False. Tracking slows simulations considerably.
+
+		"""
+
 		import matplotlib.pyplot as plt
-		C = mpl.rcParams["axes.color_cycle"]
 
+		# Define a nice colour palette
 		try :
 			import seaborn as sns
 			C = sns.color_palette("deep", 6)
 		except ImportError :
-			pass
+			import matplotlib as mpl
+			C = mpl.rcParams["axes.color_cycle"]
 
+		# Sample everything
 		t, mean, dn, up = self.sample(T, 
 									  trajectories=trajectories, 
 									  bootstraps=bootstraps, 
@@ -458,11 +716,15 @@ class model(object) :
 									  silent=silent, 
 									  **kwargs)
 
+		# Determine which states we want to plot
 		statestoplot = kwargs["plot"] if "plot" in kwargs else self.states
 
+		# Plot them
 		for s, state in enumerate(statestoplot) :
 			plt.plot(t, mean[state], lw=3)
 			plt.fill_between(t, dn[state], up[state], alpha=0.4, color=C[s % 6])
+
+		# Make pretty
 		plt.legend(statestoplot)
 		plt.xlabel("Time")
 		plt.xlim(0, T)
@@ -476,14 +738,15 @@ class model(object) :
 
 
 
-
+	# Do we still need this ?
+	"""
 	def trackindividuals(self, t=None, tracked=None, sampleto=0, **kwargs) :
 
 		if sampleto :
 			t, trace, tracked = self.simulate(sampleto, track=True, **kwargs)
 
 		return helpers.trackIndividuals(self, tracked, t, **kwargs)
-
+	"""
 
 
 
@@ -493,3 +756,4 @@ class model(object) :
 # Round up still required in defining trace[] array in tauleap ? Added; check it works
 # Progbar for bootstrapping in sample() and plotsamples() is epic fail
 # Require constraints on events : don't do X if Y == 0, for example
+# Found a ripple in the spacetime continuum

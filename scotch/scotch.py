@@ -15,6 +15,7 @@ except ImportError :
 """
 import helpers
 import simulate
+import inference
 
 
 
@@ -131,7 +132,7 @@ class model(object) :
 			self.optional = { "default_algorithm" : "gillespie" } # Optional fields, like dataset, save name, ...
 			self.states_map = {} # Map between state symbols and vector notation
 			self.transition = None # Transition matrix
-			
+
 
 
 
@@ -164,7 +165,7 @@ class model(object) :
 			# It's optional, but if it isn't defined, set the default algo
 			if "default_algorithm" not in self.optional :
 				self.optional["default_algorithm"] = "gillespie"
-			
+
 			# Some model stuff
 			self.build()
 
@@ -225,12 +226,12 @@ class model(object) :
 		--------------------------------
 
 		Save a complete scotch model to JSON file for later use.
-		
+
 		Filename can be a string defining a local or complete path,
 		including filename in which to save the model.
 
-		If Filename is None, the model is saved to the location 
-		specified in the model.optional dictionary. If this is empty, 
+		If Filename is None, the model is saved to the location
+		specified in the model.optional dictionary. If this is empty,
 		Filename is defined as "./scotch_model.json".
 
 		"""
@@ -248,7 +249,7 @@ class model(object) :
 				"InitialConditions" : self.initconds,
 				"Parameters" : self.parameters,
 				"Events" : self.events }
-		
+
 		# Add optional fields if any exist
 		for optional_field, optional_value in self.optional.items() :
 			out[optional_field] = optional_value
@@ -282,6 +283,10 @@ class model(object) :
 			for i in e[1] :
 				self.transition[self.states_map[i], idx] = e[1][i]
 
+		# Cast parameters as strings
+		for key, val in self.parameters.items() :
+			if type(val) is not str :
+				self.parameters[key] = str(val)
 
 		# State vector
 		self.X = np.zeros(self.N_states)
@@ -292,7 +297,7 @@ class model(object) :
 		self.rates = []
 		for e in self.events :
 			self.rates.append(eval("lambda X, time : %s" % helpers.parse(e[0], self.states_map, self.parameters)))
-		
+
 		if not silent :
 			print self
 
@@ -313,7 +318,7 @@ class model(object) :
 		Invoke the wizard to guide you through model creation.
 
 		This is an interactive function that will ask you the names
-		of your system's states, their initial conditions, the 
+		of your system's states, their initial conditions, the
 		parameters in the system and their values, and the expressions
 		that define the rate at which transitions occur between states.
 
@@ -328,7 +333,7 @@ class model(object) :
 		# Initial condition for each variable
 		print "\nInitial conditions (integers) :"
 		self.initconds = { s : int(raw_input("%s : " % s)) for s in self.states }
-		
+
 		# Parameters
 		print "\nComplete list of parameters, separated by commas :"
 		params = raw_input().replace(" ", "").split(",")
@@ -342,7 +347,7 @@ class model(object) :
 		self.events = []
 		print "\nEvents, as \"<rate>, <state_change>, ...\" lists, with commas between state changes and X+1, Y-1 as example changes :"
 		while True :
-			
+
 			# Grab user input of one event
 			event = raw_input().split(",")
 			if event == [""] : # if they hit Enter
@@ -388,7 +393,7 @@ class model(object) :
 
 		If algorithm="tauLeap", you may want to specify
 		tau=delta_t, where delta_t is the timestep at which tau-leaping
-		should be done. 
+		should be done.
 		By default, tau=1.
 
 		If no algorithm is passed, we use the default algorithm as
@@ -451,7 +456,7 @@ class model(object) :
 
 		If algorithm="tauLeap", you may want to specify
 		tau=delta_t, where delta_t is the timestep at which tau-leaping
-		should be done. 
+		should be done.
 		By default, tau=1.
 
 		If no algorithm is passed, we use the default algorithm as
@@ -466,7 +471,7 @@ class model(object) :
 		every time this is run; carry forward the last state space.
 		By default, propagate=False.
 
-		track=False, track=True, 
+		track=False, track=True,
 		If track, we track all transitions as they occur and return
 		these as a third output variable.
 		By default, track=False. Tracking slows simulations considerably.
@@ -479,7 +484,7 @@ class model(object) :
 
 		# Run the algorithm
 		return algorithm(self, T, **kwargs)
-		
+
 
 
 
@@ -500,7 +505,7 @@ class model(object) :
 
 		trajectories is the number of realisations to simulate.
 
-		bootstraps is the number of bootstrap samples to draw to 
+		bootstraps is the number of bootstrap samples to draw to
 		compute the confidence intervals.
 		bootstraps=0 means CI_low and CI_high are not returned;
 		only the mean trajectory is calculated.
@@ -521,7 +526,7 @@ class model(object) :
 
 		If algorithm="tauLeap", you may want to specify
 		tau=delta_t, where delta_t is the timestep at which tau-leaping
-		should be done. 
+		should be done.
 		By default, tau=1.
 
 		If no algorithm is passed, we use the default algorithm as
@@ -536,7 +541,7 @@ class model(object) :
 		every time this is run; carry forward the last state space.
 		By default, propagate=False.
 
-		track=False, track=True, 
+		track=False, track=True,
 		If track, we track all transitions as they occur and return
 		these as a third output variable.
 		By default, track=False. Tracking slows simulations considerably.
@@ -556,13 +561,13 @@ class model(object) :
 
 			if not silent :
 				helpers.progBarUpdate([traj-1, traj], trajectories)
-			
+
 			# Simulate the model
 			t, trace = self.simulate(T, silent=True, **kwargs)
 
 			# Append the time and traces to our arrays
 			all_t.append(t)
-			all_trace.append(trace)	
+			all_trace.append(trace)
 
 
 		if not silent :
@@ -606,7 +611,7 @@ class model(object) :
 			for dimidx, dim in enumerate(self.states) :
 				means[dim] = []
 
-				
+
 				# and for each bootstrap iteration
 				for iidx, i in enumerate(idx) :
 					# Calculate the means of this iteration
@@ -642,7 +647,7 @@ class model(object) :
 	def plotsamples(self, T, trajectories=100, bootstraps=1000, tvals=1000, alpha=0.95, silent=False, **kwargs) :
 		"""
 		scotch.model.plotsamples(T, trajectories=100, bootstraps=500, tvals=1000, alpha=0.95)
-		-----------------------------------------==------------------------------------------
+		-------------------------------------------------------------------------------------
 
 		Plot the mean and CIs of multiple realisations.
 
@@ -650,7 +655,7 @@ class model(object) :
 
 		trajectories is the number of realisations to simulate.
 
-		bootstraps is the number of bootstrap samples to draw to 
+		bootstraps is the number of bootstrap samples to draw to
 		compute the confidence intervals.
 		bootstraps=0 means CI_low and CI_high are not returned;
 		only the mean trajectory is calculated.
@@ -675,7 +680,7 @@ class model(object) :
 
 		If algorithm="tauLeap", you may want to specify
 		tau=delta_t, where delta_t is the timestep at which tau-leaping
-		should be done. 
+		should be done.
 		By default, tau=1.
 
 		If no algorithm is passed, we use the default algorithm as
@@ -690,7 +695,7 @@ class model(object) :
 		every time this is run; carry forward the last state space.
 		By default, propagate=False.
 
-		track=False, track=True, 
+		track=False, track=True,
 		If track, we track all transitions as they occur and return
 		these as a third output variable.
 		By default, track=False. Tracking slows simulations considerably.
@@ -708,12 +713,12 @@ class model(object) :
 			C = mpl.rcParams["axes.color_cycle"]
 
 		# Sample everything
-		t, mean, dn, up = self.sample(T, 
-									  trajectories=trajectories, 
-									  bootstraps=bootstraps, 
-									  tvals=tvals, 
-									  alpha=alpha, 
-									  silent=silent, 
+		t, mean, dn, up = self.sample(T,
+									  trajectories=trajectories,
+									  bootstraps=bootstraps,
+									  tvals=tvals,
+									  alpha=alpha,
+									  silent=silent,
 									  **kwargs)
 
 		# Determine which states we want to plot
@@ -738,6 +743,33 @@ class model(object) :
 
 
 
+
+
+
+	def infer(self, method="MLE", **kwargs) :
+		"""
+		scotch.model.infer(method="MLE")
+		--------------------------------
+
+		Estimate parameter values.
+
+		The current method is a naive maximum likelihood (MLE) method.
+
+		method="MLE"
+		The MLE method requires an argument tmax=100, for example.
+		"""
+
+		return eval("inference.{}(self, **kwargs)".format(method))
+
+
+
+
+
+
+
+
+
+
 	# Do we still need this ?
 	"""
 	def trackindividuals(self, t=None, tracked=None, sampleto=0, **kwargs) :
@@ -751,9 +783,9 @@ class model(object) :
 
 
 # PROBLEMS :
-# 
-# Tauleap state space still goes negative occasionally; seems dependent on tau / tmax
+#
 # Round up still required in defining trace[] array in tauleap ? Added; check it works
 # Progbar for bootstrapping in sample() and plotsamples() is epic fail
 # Require constraints on events : don't do X if Y == 0, for example
+# plot() and plotsamples() - simulate further than tmax and trim to reduce sporadic crap
 # Found a ripple in the spacetime continuum

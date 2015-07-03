@@ -21,9 +21,6 @@ class FileNotFound(Exception) :
 class InvalidModel(Exception) :
 	pass
 
-class SimulationError(Exception) :
-	pass
-
 
 
 
@@ -385,6 +382,8 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 		for idx, val in enumerate(t[:-1]) :
 			# print("Time is")
 			# print(val)
+			# print("Time index is")
+			# print(idx)
 			# reset matrix of number of IDs to move (number of events by number of states)
 			numIDs_to_move = np.zeros((model.N_events, model.N_states))
 			for idx2, val2 in enumerate(tracking_array[:,idx]) :
@@ -458,13 +457,13 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 					state_idx_remove = np.where(item2 < 0)[0]
 					num_items_to_move = item2[state_idx_remove]
 					ids_to_move = []
-					print "Event is " + model.events[idx2][0]
-					print "state_idx_remove is %d" %state_idx_remove
-					print "number of IDs to move is %d" %num_items_to_move
-					print "length of temp_stateDict[state_idx_remove] is " 
-					print len(temp_stateDict[state_idx_remove])
-					print "length of tempIDsToRemove[state_idx_remove] is " 
-					print len(tempIDsToRemove[state_idx_remove])
+					# print "Event is " + model.events[idx2][0]
+					# print "state_idx_remove is %d" %state_idx_remove
+					# print "number of IDs to move is %d" %num_items_to_move
+					# print "length of temp_stateDict[state_idx_remove] is " 
+					# print len(temp_stateDict[state_idx_remove])
+					# print "length of tempIDsToRemove[state_idx_remove] is " 
+					# print len(tempIDsToRemove[state_idx_remove])
 					
 
 					for i in np.random.choice(tempIDsToRemove[state_idx_remove],np.abs(num_items_to_move),replace=False) :
@@ -478,8 +477,8 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 							# print temp_actorPairsList
 
 					    tempIDsToRemove[state_idx_remove].remove(i)
-					print "new length of tempIDsToRemove[state_idx_remove] is " 
-					print len(tempIDsToRemove[state_idx_remove])
+					# print "new length of tempIDsToRemove[state_idx_remove] is " 
+					# print len(tempIDsToRemove[state_idx_remove])
 
 					#add IDs to state that gets incremented    
 					state_idx_add = np.where(item2 > 0)[0]
@@ -489,7 +488,7 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 													
 					
 			# Update statesDict to reflect the changes made during the transition,
-			print "Made it to incrementing step for timestep %d" %idx
+			# print "Made it to incrementing step for timestep %d" %idx
 			for idx3, item in enumerate(model.states) :			
 				#temp_stateDict[idx3] = tempIDsToRemove[idx3] + tempIDsToAdd[idx3]
 				#statesDict[item].append(temp_stateDict[idx3]) 

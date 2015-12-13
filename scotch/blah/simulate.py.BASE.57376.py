@@ -24,12 +24,12 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs)
 		model.build(silent=True) # initialise model
 
 	# Initialise the trace
-	trace = []
-	trace.append(model.X[:].astype(int))
+	trace = model.X[:]
 
 	# Preallocate array of tracked reactions
 	if track :
-		tracked_trans_array = []
+		tracked_trans_array = np.zeros((model.N_events,randsize))
+		tcount = 0
 
 	# Pregenerate some random numbers
 	rand = np.random.uniform(size=1000)
@@ -56,10 +56,7 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs)
 		if not np.any(np.array(rates) > 0) :
 			if not silent :
 				print "No more possible events, stopping early !"
-			out = [t, np.array(trace)]
-			if track :
-				out.append(np.array(tracked_trans_array))
-			return out
+			return (t, trace) if not track else (t, trace, tracked_trans_array)
 
 		# Draw a waiting time
 		t.append(t[-1] + np.random.exponential(1./np.sum(rates)))
@@ -75,17 +72,13 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs)
 
 		# If we're tracking, keep track of the transition
 		if track :
-			currentevent = np.zeros(model.N_events)
-			currentevent[trans] = 1
-			tracked_trans_array.append(currentevent)
-			"""
 			tracked_trans_array[trans, tcount] = 1
 			tcount += 1
 			if tcount >= tracked_trans_array.shape[1] :
 				tracked_trans_array = np.hstack((tracked_trans_array, \
 										np.zeros((model.N_events,randsize))))
-			"""
 
+		
 
 		# At the end of randsize iterations, update randsize "adaptively"
 		rcount += 1
@@ -96,10 +89,9 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs)
 			tlast = t[-1]
 
 
-
+		
 		# Append new state space to trace
-		trace.append(list(model.X))
-
+		trace = np.vstack((trace, model.X)).astype(int)
 
 		# Update progress bar
 		if not silent :
@@ -110,15 +102,11 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs)
 
 	# Reset state space
 	if not propagate :
-		model.X = np.array([model.initconds[x] for x in model.states],
+		model.X = np.array([model.initconds[x] for x in model.states], 
 					dtype=int)
 
 	# Return
-	out = [t, np.array(trace)]
-	if track :
-		out.append(np.array(tracked_trans_array))
-
-	return out
+	return (t, trace) if not track else (t, trace, tracked_trans_array)
 
 
 
@@ -146,19 +134,20 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, **kw
 	t = [0]
 
 	# Initialise the trace
-	trace = []
-	trace.append(model.X[:].astype(int))
+	trace = model.X[:]
 
 	# Timestep and tracking indices
 	idx = 0
+	tracking_idx = -1;
 
 	# Start the progress bar
 	if not silent :
 		helpers.progBarStart()
 
-	# Array of tracked reactions
+	# Preallocate array of tracked reactions
 	if track :
-		tracked_trans_array = []#np.zeros((model.N_events,1)) #int(tmax/tau)))
+		tracked_trans_array = np.zeros((model.N_events,int(tmax/tau)))
+		counter = 0
 
 	# Which transitions need to be capped ?
 	cappedEvents = -(model.transition * (model.transition < 0))
@@ -168,8 +157,8 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, **kw
 
 	# Simulation loop #########################################################
 	while t[-1] < tmax :
-
-		# Compute a rates vector
+	
+		# Compute a rates vector 
 		rates = [rate(model.X, t[-1]) for rate in model.rates]
 
 		# Ensure all rates are valid
@@ -180,19 +169,28 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, **kw
 		if not np.any(np.array(rates) > 0) :
 			if not silent :
 				print "No more possible events, stopping early !"
-			# Return
-			out = [t, np.array(trace)]
-			if track :
-				out.append(np.array(tracked_trans_array))
-			return out
+			return (t, trace) if not track else (t, trace, tracked_trans_array)
 
 
-
+		# What the hell was this madness ?
+		# It's here for book-keeping until next update, but
+		# serves no purpose... Too much caffeine ?!
+		"""
+		# Determine which events occurred after ensuring that there's 
+		# a valid transition, and update the state space
+		if np.sum(rates) <= 0 :
+			if not silent :
+				print "Stopping early - no valid transitions !"
+			trace = np.delete(trace,range(idx+1,int(tmax/tau)+1),0)
+			t = np.delete(t,range(idx+1,int(tmax/tau)+1),0)
+			if track:
+				tracked_trans_array = np.delete(tracked_trans_array,range(idx+1,int(tmax/tau)+1),1)
+			break
+		"""
 
 		# Estimate the total number of events per transition
 		estEvents = np.array([np.random.poisson(rate * tau) \
 			for rate in rates], dtype=int)
-
 
 		# Find the maximum number of removals from a state that can occur
 		maxEvents = (cappedEvents * estEvents).sum(1)
@@ -228,21 +226,14 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, **kw
 
 		# Append new state space to trace, increment timestep index
 		idx += 1
-		trace.append(list(model.X))
+		trace = np.vstack((trace, model.X))
 
+		
 
+		
 		# Record tracked reactions
 		if track :
-			tracked_trans_array.append(estEvents)
-			"""
-			if idx >= tracked_trans_array.shape[1] :
-				addingEvents = np.expand_dims(estEvents, axis=1)
-				tracked_trans_array = np.hstack((tracked_trans_array, addingEvents))
-			else :
-				tracked_trans_array[:, idx] = estEvents
-			"""
-
-
+			tracked_trans_array[:, idx] = estEvents
 
 		# Update progress bar
 		if not silent :
@@ -256,11 +247,12 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, **kw
 	# Reset state space unless the user wants to carry it forward
 	if not propagate :
 		model.X = np.array([model.initconds[x] for x in model.states], dtype=int)
-
-
+	
 	# Return
-	out = [t, np.array(trace)]
-	if track :
-		out.append(np.array(tracked_trans_array))
+	return (t, trace, tracked_trans_array) if track else (t, trace)
 
-	return out
+
+
+
+
+

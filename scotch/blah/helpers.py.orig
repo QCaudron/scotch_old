@@ -21,9 +21,6 @@ class FileNotFound(Exception) :
 class InvalidModel(Exception) :
 	pass
 
-class SimulationError(Exception) :
-	pass
-
 
 
 
@@ -463,6 +460,16 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 					state_idx_remove = np.where(item2 < 0)[0]
 					num_items_to_move = item2[state_idx_remove]
 					ids_to_move = []
+<<<<<<< HEAD
+					print "Event is " + model.events[idx2][0]
+					print "state_idx_remove is %d" %state_idx_remove
+					print "number of IDs to move is %d" %num_items_to_move
+					print "length of temp_stateDict[state_idx_remove] is "
+					print len(temp_stateDict[state_idx_remove])
+					print "length of tempIDsToRemove[state_idx_remove] is "
+					print len(tempIDsToRemove[state_idx_remove])
+
+=======
 					# print "Event is " + model.events[idx2][0]
 					# print "state_idx_remove is %d" %state_idx_remove
 					# print "number of IDs to move is %d" %num_items_to_move
@@ -471,7 +478,7 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 					# print "length of tempIDsToRemove[state_idx_remove] is " 
 					# print len(tempIDsToRemove[state_idx_remove])
 					
-
+>>>>>>> origin/master
 
 					for i in np.random.choice(tempIDsToRemove[state_idx_remove],np.abs(num_items_to_move),replace=False) :
 					    ids_to_move.append(i)
@@ -484,8 +491,13 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 							# print temp_actorPairsList
 
 					    tempIDsToRemove[state_idx_remove].remove(i)
+<<<<<<< HEAD
+					print "new length of tempIDsToRemove[state_idx_remove] is "
+					print len(tempIDsToRemove[state_idx_remove])
+=======
 					# print "new length of tempIDsToRemove[state_idx_remove] is " 
 					# print len(tempIDsToRemove[state_idx_remove])
+>>>>>>> origin/master
 
 					#add IDs to state that gets incremented
 					state_idx_add = np.where(item2 > 0)[0]
@@ -495,8 +507,13 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 
 
 			# Update statesDict to reflect the changes made during the transition,
+<<<<<<< HEAD
+			print "Made it to incrementing step for timestep %d" %idx
+			for idx3, item in enumerate(model.states) :
+=======
 			# print "Made it to incrementing step for timestep %d" %idx
 			for idx3, item in enumerate(model.states) :			
+>>>>>>> origin/master
 				#temp_stateDict[idx3] = tempIDsToRemove[idx3] + tempIDsToAdd[idx3]
 				#statesDict[item].append(temp_stateDict[idx3])
 				statesDict[item].append(list(tempIDsToRemove[idx3] + tempIDsToAdd[idx3]))

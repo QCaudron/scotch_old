@@ -392,7 +392,7 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 			# print(idx)
 			# reset matrix of number of IDs to move (number of events by number of states)
 			numIDs_to_move = np.zeros((model.N_events, model.N_states))
-			for idx2, val2 in enumerate(tracking_array[:,idx]) :
+			for idx2, val2 in enumerate(tracking_array[idx,:]) :
 				#calculate how many transitions to do
 				numIDs_to_move[idx2,:] = model.transition[:,idx2]*val2
 			# print("numIDs_to_move is")

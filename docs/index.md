@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/QCaudron/scotch/master/docs/images/logo.jpg" style="width: 200px;" />
 
-_scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch**ains, or Markov processes. We are currently in alpha release; contributions are very welcome. For pull requests or bug reports, find us on [Github](http://qcaudron.github.io/scotch). The core developers are [Quentin Caudron](http://quentincaudron.com) and [Ruthie Birger](http://ruthiebirger.com).
+_scotch_ implements algorithms for **s**tochastic, **co**ntinuous-**t**ime **ch**ains, or Markov processes. We are currently in alpha release; contributions are very welcome. For pull requests or bug reports, find us on [Github](https://github.com/QCaudron/scotch). The core developers are [Quentin Caudron](http://quentincaudron.com) and [Ruthie Birger](http://ruthiebirger.com).
 
 
 

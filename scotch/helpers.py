@@ -463,14 +463,7 @@ def trackIndividuals(model, tracking_array, t, keepIndividuals = False, trackAct
 					state_idx_remove = np.where(item2 < 0)[0]
 					num_items_to_move = item2[state_idx_remove]
 					ids_to_move = []
-					# print "Event is " + model.events[idx2][0]
-					# print "state_idx_remove is %d" %state_idx_remove
-					# print "number of IDs to move is %d" %num_items_to_move
-					# print "length of temp_stateDict[state_idx_remove] is " 
-					# print len(temp_stateDict[state_idx_remove])
-					# print "length of tempIDsToRemove[state_idx_remove] is " 
-					# print len(tempIDsToRemove[state_idx_remove])
-					
+
 
 
 					for i in np.random.choice(tempIDsToRemove[state_idx_remove],np.abs(num_items_to_move),replace=False) :

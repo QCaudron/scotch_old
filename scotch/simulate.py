@@ -1,7 +1,7 @@
 # Simulation algorithms
 import numpy as np
 import helpers
-
+from copy import copy, deepcopy
 
 
 
@@ -184,29 +184,117 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, noNe
            for rate in rates], dtype=int)
 
 		# Calculate transitions by statespace
+		#tempTransitions_array = model.transition * estEvents
 
-		tempTransitions = np.sum(model.transition * estEvents, axis=1).astype(int)  
+		# Create array of state space values to test against transitions
+		#tempStateSpace = np.tile(model.X.reshape([model.N_states,1]), model.N_events)
 
-		
-		
-		#Check if negative states exist and if they are allowed
-		if noNegStatesAllowed & np.any(model.X + tempTransitions < 0) :
-			#if negative states exist but are not allowed, find where they are                  
-			tempNewModelStates =model.X + tempTransitions
-			negidx= np.where(tempNewModelStates<0)
-			#calculate ratio by which to reduce all transitions (max ratio of differences in events)
-			reductionRatio = min(1-tempNewModelStates[negidx]/tempTransitions[negidx])
-			#Adjust number of events done down by ratio
-			estEvents = reductionRatio*estEvents
-			#update t by adjusted tau
-			t.append(t[idx] + tau * reductionRatio)
+		# Calculate net transitions by statespace
+		tempTransitions = np.sum(model.transition * estEvents, axis=1).astype(int) 
+
+		# Calculate negative transitions by statespace
+		negTransitions = deepcopy(model.transition)
+		negTransitions[model.transition>=0] =0 
+		tempNegTransitions = np.sum(negTransitions * estEvents, axis=1).astype(int)
+
+		# If tracking is on, check if there are any total negative transitions that go below the number
+		# individuals in the statespace 
+		if track :
+			if noNegStatesAllowed & np.any(model.X + tempNegTransitions <0) :
+				# create blank new transitions vector
+				tempNewNegTransitions = np.zeros(model.N_states)
+				#create new Events vector
+				newEvents = np.zeros(model.N_events)
+				# initiate tempEvents vector as estEvents
+				tempEvents = deepcopy(estEvents)
+				while np.all(model.X + tempNewNegTransitions >0) :
+					#randomly pick an event from est Events
+					newEventIdx = np.random.choice(model.N_events,None,True, tempEvents.astype(float)/np.sum(tempEvents))
+					newEvents[newEventIdx] +=1
+					tempEvents[newEventIdx]-=1
+					#create vector of new negative transitions
+					tempNewNegTransitions = np.sum(negTransitions * newEvents, axis=1).astype(int)
+				diff = estEvents-newEvents
+				reductionRatio = min(1-diff[diff>0]/estEvents[diff>0])
+				#reductionRatio = max(newEvents/estEvents)
+				model.X += np.sum(model.transition*newEvents, axis=1).astype(int)
+				t.append(t[idx]+reductionRatio*tau)
+				tracked_trans_array.append(newEvents)
+			else :
+				model.X += np.sum(model.transition*estEvents, axis=1).astype(int)
+				t.append(t[idx]+tau)
+				tracked_trans_array.append(estEvents)
 		else :
-		# Otherwise, add a full tau increment to the time array
-			t.append(t[idx] + tau)
+			#Check if negative states exist and if they are allowed
+			if noNegStatesAllowed & np.any(model.X + tempTransitions < 0) :
+				#if negative states exist but are not allowed, find where they are                  
+				tempNewModelStates =model.X + tempTransitions
+				negidx= np.where(tempNewModelStates<0)
+				#calculate ratio by which to reduce all transitions (max ratio of differences in events)
+				reductionRatio = min(1-tempNewModelStates[negidx]/tempTransitions[negidx])
+				#Adjust number of events done down by ratio
+				estEvents_new = reductionRatio*estEvents
+				# Update the state space
+				model.X += np.sum(model.transition * estEvents_new, axis=1).astype(int)
+				#update t by adjusted tau
+				t.append(t[idx] + tau * reductionRatio)
+			else :
+			# Otherwise, add a full tau increment to the time array
+				t.append(t[idx] + tau)
+				# Update the state space
+				model.X += np.sum(model.transition * estEvents, axis=1).astype(int)
 
-		# Update the state space
-		model.X += np.sum(model.transition * estEvents, axis=1).astype(int)
-	
+
+
+					
+		#check for negative
+		# randomly until go negative -- keep track of new events vs est events -- that is ratio
+
+		
+		# #check if there are negative transitions
+		# # check it total number of negative transitions goes below 0 
+		# if noNegStatesAllowed & np.any((tempStateSpace + tempTransitions_array )<0) :
+		# 	#if negative states exist but are not allowed, find where they are                  
+		# 	tempNewStateSpaceChanges = (tempStateSpace+tempTransitions_array)
+		# 	negidx = np.where(tempNewStateSpaceChanges <0) 
+		# 	#calculate ratio by which to reduce all transitions (max ratio of differences in events)
+		# 	reductionRatio = min(1-tempNewStateSpaceChanges[negidx]/tempTransitions_array[negidx])
+		# 	#Adjust number of events done down by ratio
+		# 	estEvents_new = reductionRatio*estEvents
+		# 	# Update the state space
+		# 	model.X += np.sum(model.transition * estEvents_new, axis=1).astype(int)
+
+		# 	if track :
+		# 		tracked_trans_array.append(estEvents_new)
+		# 		print("time idx is")
+		# 		print(idx)
+		# 		print("time is")
+		# 		print(t[idx])
+		# 		print("estEvents_new are")
+		# 		print(estEvents_new)
+		# 		print("time idx is")
+		# 		print(idx)
+		# 		print("time is")
+		# 		print(t[idx])
+		# 	#update t by adjusted tau
+		# 	t.append(t[idx] + tau * reductionRatio)
+		# else :
+		# # Otherwise, add a full tau increment to the time array
+		# 	t.append(t[idx] + tau)
+		# 	if track :
+		# 		tracked_trans_array.append(estEvents)
+		# 		print("time idx is")
+		# 		print(idx)
+		# 		print("time is")
+		# 		print(t[idx])
+		# 		print("estEvents are")
+		# 		print(estEvents)
+
+		# 	# Update the state space
+		# 	model.X += np.sum(model.transition * estEvents, axis=1).astype(int)
+		
+			
+		
 		# Append new state space to trace, increment timestep index
 		idx += 1
 		trace.append(list(model.X))
@@ -216,8 +304,8 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, noNe
 			helpers.progBarUpdate(t[idx:(idx+1)],len(t))
 
 		# Record tracked reactions
-		if track :
-			tracked_trans_array.append(estEvents)
+		#if track :
+		#	tracked_trans_array.append(estEvents)
 		
 
 

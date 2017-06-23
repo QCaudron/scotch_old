@@ -1,9 +1,9 @@
 
-__all__ = ["scotch", "simulate"]
+__all__ = ["scotch", "simulate", "helpers"]
 
 
-from .scotch import *
-from simulate import gillespie
+from scotch import *
+from simulate import gillespie, tauLeap
 
 
 """

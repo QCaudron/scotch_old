@@ -55,7 +55,7 @@ def gillespie(model, tmax, track=False, silent=False, propagate=False, **kwargs)
 		# Ensure there are possible events to continue with
 		if not np.any(np.array(rates) > 0) :
 			if not silent :
-				print "No more possible events, stopping early !"
+				print("No more possible events, stopping early !")
 			out = [t, np.array(trace)]
 			if track :
 				out.append(np.array(tracked_trans_array))
@@ -172,7 +172,7 @@ def tauLeap(model, tmax, tau=1, track=False, silent=False, propagate=False, noNe
 		 # Ensure there are possible events to continue with
 		if not np.any(np.array(rates) > 0) :
 			if not silent :
-				print "No more possible events, stopping early !"
+				print("No more possible events, stopping early !")
 			# Return
 			out = [t, np.array(trace)]
 			if track :

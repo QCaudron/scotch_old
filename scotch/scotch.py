@@ -15,9 +15,11 @@ except ImportError :
 """
 import helpers
 import simulate
-import inference
 
-
+try: 
+	input = raw_input
+except NameError: 
+	pass
 
 
 
@@ -299,7 +301,7 @@ class model(object) :
 			self.rates.append(eval("lambda X, time : %s" % helpers.parse(e[0], self.states_map, self.parameters)))
 
 		if not silent :
-			print self
+			print(self)
 
 
 
@@ -325,31 +327,31 @@ class model(object) :
 		"""
 
 		# Variables
-		print "Complete list of state variables, separated by commas :"
-		self.states = raw_input().replace(" ", "").split(",")
+		print("Complete list of state variables, separated by commas :")
+		self.states = input().replace(" ", "").split(",")
 		self.N_states = len(self.states)
 		self.states_map = { s : idx for s, idx in zip(self.states, range(self.N_states)) }
 
 		# Initial condition for each variable
-		print "\nInitial conditions (integers) :"
-		self.initconds = { s : int(raw_input("%s : " % s)) for s in self.states }
+		print("\nInitial conditions (integers) :")
+		self.initconds = { s : int(input("%s : " % s)) for s in self.states }
 
 		# Parameters
-		print "\nComplete list of parameters, separated by commas :"
-		params = raw_input().replace(" ", "").split(",")
+		print("\nComplete list of parameters, separated by commas :")
+		params = input().replace(" ", "").split(",")
 
 		# Value of each parameter
-		print "\nValues of parameters :"
-		self.parameters = { p : raw_input("%s : " % p) for p in params }
+		print("\nValues of parameters :")
+		self.parameters = { p : input("%s : " % p) for p in params }
 
 		# State transitions
 		event = []
 		self.events = []
-		print "\nEvents, as \"<rate>, <state_change>, ...\" lists, with commas between state changes and X+1, Y-1 as example changes :"
+		print("\nEvents, as \"<rate>, <state_change>, ...\" lists, with commas between state changes and X+1, Y-1 as example changes :")
 		while True :
 
 			# Grab user input of one event
-			event = raw_input().split(",")
+			event = input().split(",")
 			if event == [""] : # if they hit Enter
 				break # stop reading in events
 
@@ -553,7 +555,7 @@ class model(object) :
 		all_trace = []
 
 		if not silent :
-			print "Sampling trajectories."
+			print("Sampling trajectories.")
 			helpers.progBarStart()
 
 		# For each trajectory index :
@@ -571,7 +573,7 @@ class model(object) :
 
 
 		if not silent :
-			print "\n"
+			print("\n")
 
 
 		# For each state variable, interpolate
@@ -603,7 +605,7 @@ class model(object) :
 
 
 			if not silent :
-				print "Bootstrapping."
+				print("Bootstrapping.")
 				helpers.progBarStart()
 
 
